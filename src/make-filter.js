@@ -9,9 +9,9 @@ const TASK_COUNT_MAX = 7;
 
 const filterLabelClickHandler = () => {
   const cardElements = boardTasksContainerElement.querySelectorAll(`.card`);
-  cardElements.forEach((cardElement) => {
-    cardElement.remove();
-  });
+  for (const value of cardElements) {
+    value.remove();
+  }
 
   for (let i = 0; i < getRandomInt(TASK_COUNT_MIN, TASK_COUNT_MAX); i++) {
     createTask();
