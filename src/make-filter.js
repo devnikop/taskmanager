@@ -1,12 +1,11 @@
 import {createTask} from './make-task.js';
 import {boardTasksContainerElement} from './make-task.js';
+import {getRandomInt} from './util.js';
 
 const FILTER_COUNT_MIN = 0;
 const FILTER_COUNT_MAX = 200;
 const TASK_COUNT_MIN = 1;
 const TASK_COUNT_MAX = 7;
-
-const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const filterLabelClickHandler = () => {
   const cardElements = boardTasksContainerElement.querySelectorAll(`.card`);
