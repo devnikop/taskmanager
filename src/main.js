@@ -14,9 +14,13 @@ const FilterName = new Set([
   `Archive`,
 ]);
 
+
+let tasks = [];
 for (let i = 0; i < TASK_COUNT_BEGIN; i++) {
-  createTask(task);
+  tasks[i] = task;
 }
+
+tasks.forEach((currentTask) => createTask(currentTask));
 
 FilterName.forEach((key) => {
   createFilter(key);
