@@ -18,7 +18,7 @@ const filterLabelClickHandler = () => {
   }
 };
 
-const filterLabelGenerate = (filterId) => {
+const renderFilterLabel = (filterId) => {
   const filterLabelElement = document.createElement(`label`);
   filterLabelElement.addEventListener(`click`, filterLabelClickHandler);
   filterLabelElement.classList.add(`filter__label`);
@@ -37,5 +37,5 @@ export const createFilter = (filterId) => {
     id='filter__${filterId.toLowerCase()}'
     name='filter'
     checked>`);
-  filterContainerElement.appendChild(filterLabelGenerate(filterId));
+  filterContainerElement.appendChild(renderFilterLabel(filterId));
 };

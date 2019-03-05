@@ -16,21 +16,21 @@ const Day = {
   SUNDAY: `su`
 };
 
-const cardControlGenerate = () =>
+const renderControls = () =>
   `<div class='card__control'>
       <button class='card__btn card__btn--edit'>edit</button>
       <button class='card__btn card__btn--archive'>archive</button>
       <button class='card__btn card__btn--favorites card__btn--disabled'>favorites</button>
   </div>`;
 
-const cardColorBarGenerate = () =>
+const renderColorBar = () =>
   `<div class='card__color-bar'>
       <svg width="100%" height="10">
         <use xlink:href="#wave"></use>
       </svg>
   </div>`;
 
-const cardTextareaGenerate = () =>
+const renderTextarea = () =>
   `<div class='card__textarea-wrap'>
       <label>
         <textarea class="card__text" placeholder="Start typing your text here..."
@@ -38,7 +38,7 @@ const cardTextareaGenerate = () =>
       </label>
   </div>`;
 
-const cardDatesGenerate = () =>
+const renderDates = () =>
   `<div class="card__dates">
     <button class="card__date-deadline-toggle"
       type="button">date:<span class="card__date-status">no</span>
@@ -81,7 +81,7 @@ const cardDatesGenerate = () =>
     </fieldset>
   </div>`;
 
-const cardHashtagGenerate = () =>
+const renderHashtag = () =>
   `<div class="card__hashtag">
     <div class="card__hashtag-list"></div>
     <label>
@@ -94,19 +94,19 @@ const cardHashtagGenerate = () =>
     </label>
   </div>`;
 
-const cardDetailsGenerate = () => {
+const renderDetails = () => {
   const cardDetailsElement = document.createElement(`div`);
   cardDetailsElement.classList.add(`card__details`);
 
-  cardDetailsElement.insertAdjacentHTML(`beforeend`, cardDatesGenerate());
-  cardDetailsElement.insertAdjacentHTML(`beforeend`, cardHashtagGenerate());
+  cardDetailsElement.insertAdjacentHTML(`beforeend`, renderDates());
+  cardDetailsElement.insertAdjacentHTML(`beforeend`, renderHashtag());
   return cardDetailsElement;
 };
 
-const cardSettingsGenerate = () => {
+const renderSettings = () => {
   const cardSettingsElement = document.createElement(`div`);
   cardSettingsElement.classList.add(`card__settings`);
-  cardSettingsElement.appendChild(cardDetailsGenerate());
+  cardSettingsElement.appendChild(renderDetails());
   cardSettingsElement.insertAdjacentHTML(`beforeend`, `<label
     class="card__img-wrap card__img-wrap--empty">
       <input
@@ -143,7 +143,7 @@ const cardSettingsGenerate = () => {
   return cardSettingsElement;
 };
 
-const cardStatusButtonsGenerate = () =>
+const renderStatusButtons = () =>
   `<div class= 'card__status-btns'>
       <button class='card__save' type='button'>save</button>
       <button class='card__delete' type='button'>delete</button>
@@ -159,11 +159,11 @@ export const createTask = () => {
 
   const cardInnerElement = document.createElement(`div`);
   cardInnerElement.classList.add(`card__inner`);
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardControlGenerate());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardColorBarGenerate());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardTextareaGenerate());
-  cardInnerElement.appendChild(cardSettingsGenerate());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardStatusButtonsGenerate());
+  cardInnerElement.insertAdjacentHTML(`beforeend`, renderControls());
+  cardInnerElement.insertAdjacentHTML(`beforeend`, renderColorBar());
+  cardInnerElement.insertAdjacentHTML(`beforeend`, renderTextarea());
+  cardInnerElement.appendChild(renderSettings());
+  cardInnerElement.insertAdjacentHTML(`beforeend`, renderStatusButtons());
 
   cardFormElement.appendChild(cardInnerElement);
   cardElement.appendChild(cardFormElement);
