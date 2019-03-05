@@ -1,26 +1,16 @@
-const Color = {
-  BLACK: `black`,
-  YELLOW: `yellow`,
-  BLUE: `blue`,
-  GREEN: `green`,
-  PINK: `pink`
-};
+const Color = new Set([
+  `black`,
+  `yellow`,
+  `blue`,
+  `green`,
+  `pink`,
+]);
 
-const Day = {
-  MONDAY: `mo`,
-  TUESDAY: `tu`,
-  WEDNESDAY: `we`,
-  THURSDAY: `th`,
-  FRIDAY: `fr`,
-  SATURDAY: `sa`,
-  SUNDAY: `su`
-};
-
-const renderControls = () =>
+const renderControls = (task) =>
   `<div class='card__control'>
       <button class='card__btn card__btn--edit'>edit</button>
       <button class='card__btn card__btn--archive'>archive</button>
-      <button class='card__btn card__btn--favorites card__btn--disabled'>favorites</button>
+      <button class='card__btn card__btn--favorites ${task.isFavorite ? `` : `card__btn--disabled`}'>favorites</button>
   </div>`;
 
 const renderColorBar = () =>
@@ -30,16 +20,17 @@ const renderColorBar = () =>
       </svg>
   </div>`;
 
-const renderTextarea = () =>
+const renderTextarea = (task) =>
   `<div class='card__textarea-wrap'>
       <label>
         <textarea class="card__text" placeholder="Start typing your text here..."
-          name="text">This is example of new task, you can add picture, set date and time, add tags.</textarea>
+          name="text">${task.title}</textarea>
       </label>
   </div>`;
 
-const renderDates = () =>
-  `<div class="card__dates">
+const renderDates = (task) => {
+  let date = new Date(task.dueDate);
+  return `<div class="card__dates">
     <button class="card__date-deadline-toggle"
       type="button">date:<span class="card__date-status">no</span>
     </button>
@@ -47,14 +38,14 @@ const renderDates = () =>
       <label class="card__input-deadline-wrap">
         <input class="card__date"
           type="text"
-          placeholder="23 September"
+          placeholder="${date.getDay() + 1} ${date.toLocaleString(`en-us`, {month: `long`})}"
           name="date"
           />
       </label>
       <label class="card__input-deadline-wrap">
         <input class="card__time"
           type="text"
-          placeholder="11:15 PM"
+          placeholder="${date.toLocaleString(`en-US`, {hour: `numeric`, hour12: true})}"
           name="time"
           />
       </label>
@@ -64,26 +55,29 @@ const renderDates = () =>
     </button>
     <fieldset class="card__repeat-days" disabled>
       <div class="card__repeat-days-inner">
-        ${Object.values(Day).map((day) => `<input
+        ${Object.entries(task.repeatingDays).map(([day, value]) => `<input
           class="visually-hidden card__repeat-day-input"
           type="checkbox"
           id="repeat-${day}-1"
           name="repeat"
           value=${day}
+          ${value === true ? `checked` : ``}
         />
-        <label
-          class="card__repeat-day"
-          for="repeat-${day}-1"
-          >${day}
-        </label>
-        `)}
+        <label class="card__repeat-day" for="repeat-${day}-1">${day}</label>
+        `).join(` `)}
       </div>
     </fieldset>
-  </div>`;
+  </div>`};
 
-const renderHashtag = () =>
+const renderHashtag = (task) =>
   `<div class="card__hashtag">
-    <div class="card__hashtag-list"></div>
+    <div class="card__hashtag-list">
+      ${[...task.tags].map((currentTag) => `<span class='card__hashtag-inner'>
+        <input class='card__hashtag-hidden-input' type='hidden' name='hashtag' value='${currentTag}'>
+        <button class='card__hashtag-name' type='button'>#${currentTag}</button>
+        <button class='card__hashtag-delete'></button>
+      </span>`).join(` `)}
+    </div>
     <label>
       <input
         type="text"
@@ -94,80 +88,66 @@ const renderHashtag = () =>
     </label>
   </div>`;
 
-const renderDetails = () => {
-  const cardDetailsElement = document.createElement(`div`);
-  cardDetailsElement.classList.add(`card__details`);
+const renderDetails = (task) =>
+  `<div class='card__details'>
+    ${renderDates(task)}
+    ${renderHashtag(task)}
+  </div>`;
 
-  cardDetailsElement.insertAdjacentHTML(`beforeend`, renderDates());
-  cardDetailsElement.insertAdjacentHTML(`beforeend`, renderHashtag());
-  return cardDetailsElement;
-};
+const renderImage = (task) =>
+  `<label class="card__img-wrap card__img-wrap--empty">
+    <input
+      type="file"
+      class="card__img-input visually-hidden"
+      name="img"
+    />
+    <img
+      src="${task.picture}"
+      alt="task picture"
+      class="card__img"
+    />
+  </label>`;
 
-const renderSettings = () => {
-  const cardSettingsElement = document.createElement(`div`);
-  cardSettingsElement.classList.add(`card__settings`);
-  cardSettingsElement.appendChild(renderDetails());
-  cardSettingsElement.insertAdjacentHTML(`beforeend`, `<label
-    class="card__img-wrap card__img-wrap--empty">
-      <input
-        type="file"
-        class="card__img-input visually-hidden"
-        name="img"
+const renderColors = (task) =>
+  `<div class='card__colors-inner'>
+    <h3 class="card__colors-title">Color</h3>
+    <div class='card__colors-wrap'>
+      ${[...Color].map((currentColor) => `<input
+        type="radio" id="color-${currentColor}-1"
+        class="card__color-input card__color-input--${currentColor} visually-hidden"
+        name="color" value="${currentColor}"
+        ${currentColor === task.color ? `checked` : ``}
       />
-      <img
-        src="img/add-photo.svg"
-        alt="task picture"
-        class="card__img"
-      />
-    </label>
-    <div class='card__colors-inner'>
-      <h3 class="card__colors-title">Color</h3>
-      <div class='card__colors-wrap'>
-        ${Object.values(Color).map((color) => `<input
-          type="radio"
-          id="color-${color}-1"
-          class="card__color-input card__color-input--${color} visually-hidden"
-          name="color"
-          value="${color}"
-          checked
-        />
-        <label
-          for="color-${color}-1"
-          class="card__color card__color--${color}"
-          >${color}
-        </label>
-        `)}
-      </div>
-    </div>`);
+      <label for="color-${currentColor}-1" class="card__color card__color--${currentColor}">${currentColor}</label>
+      `).join(` `)}
+    </div>
+  </div>`;
 
-  return cardSettingsElement;
-};
+const renderSettings = (task) =>
+  `<div class='card__settings'>
+    ${renderDetails(task)}
+    ${renderImage(task)}
+    ${renderColors(task)}
+  </div>`;
 
 const renderStatusButtons = () =>
   `<div class= 'card__status-btns'>
-      <button class='card__save' type='button'>save</button>
-      <button class='card__delete' type='button'>delete</button>
+    <button class='card__save' type='button'>save</button>
+    <button class='card__delete' type='button'>delete</button>
   </div>`;
 
-export const createTask = () => {
-  const cardElement = document.createElement(`article`);
-  cardElement.classList.add(`card`, `card--repeat`, `card--black`);
-
-  const cardFormElement = document.createElement(`form`);
-  cardFormElement.classList.add(`card__form`);
-  cardFormElement.method = `get`;
-
-  const cardInnerElement = document.createElement(`div`);
-  cardInnerElement.classList.add(`card__inner`);
-  cardInnerElement.insertAdjacentHTML(`beforeend`, renderControls());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, renderColorBar());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, renderTextarea());
-  cardInnerElement.appendChild(renderSettings());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, renderStatusButtons());
-
-  cardFormElement.appendChild(cardInnerElement);
-  cardElement.appendChild(cardFormElement);
-  boardTasksContainerElement.appendChild(cardElement);
+export const createTask = (task) => {
+  boardTasksContainerElement.insertAdjacentHTML(`beforeend`, `<article class='card card--repeat card--black'>
+    <form class='card__form' method='get'>
+      <div class='card__inner'>
+        ${renderControls(task)}
+        ${renderColorBar()}
+        ${renderTextarea(task)}
+        ${renderSettings(task)}
+        ${renderStatusButtons()}
+      </div>
+    </form>
+  </article>`);
 };
 
 export const boardTasksContainerElement = document.querySelector(`.board__tasks`);

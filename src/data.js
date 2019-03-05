@@ -1,13 +1,20 @@
+const Time = new Map([
+  [`HOURS`, 24],
+  [`MINUTES`, 60],
+  [`SECONDS`, 60],
+  [`MILLISECONDS`, 1000],
+]);
+
 export const task = {
   title: [
     `Learn theory`,
     `Just do homework`,
     `Finish intensive on a hundred points`
-  ][Math.floor(Math.round() * 3)],
-  dueDate: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
+  ][Math.floor(Math.random() * 3)],
+  dueDate: +Date.now() + 1 + Math.floor(Math.random() * 7)
+    * Time.get(`HOURS`) * Time.get(`MINUTES`) * Time.get(`SECONDS`) * Time.get(`MILLISECONDS`),
   tags: new Set([
     `cinema`,
-    `entartainment`,
     `myself`,
     `homework`,
     `theory`,
@@ -16,13 +23,7 @@ export const task = {
     `keks`
   ]),
   picture: `http://picsum.photos/100/100?r=${Math.random()}`,
-  color: {
-    'black': false,
-    'yellow': false,
-    'blue': false,
-    'green': true,
-    'pink': false
-  },
+  color: `green`,
   repeatingDays: {
     'mo': true,
     'tu': false,
@@ -32,6 +33,6 @@ export const task = {
     'sa': false,
     'su': true
   },
-  isFavorite: true,
+  isFavorite: false,
   isDone: false
 };
