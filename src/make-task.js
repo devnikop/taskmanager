@@ -67,7 +67,8 @@ const renderDates = (task) => {
         `).join(` `)}
       </div>
     </fieldset>
-  </div>`};
+  </div>`;
+};
 
 const renderHashtag = (task) =>
   `<div class="card__hashtag">
