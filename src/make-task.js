@@ -29,7 +29,7 @@ const renderTextarea = (task) =>
   </div>`;
 
 const renderDates = (task) => {
-  let date = new Date(task.dueDate);
+  const date = new Date(task.dueDate);
   return `<div class="card__dates">
     <button class="card__date-deadline-toggle"
       type="button">date:<span class="card__date-status">no</span>
@@ -61,10 +61,10 @@ const renderDates = (task) => {
           id="repeat-${day}-1"
           name="repeat"
           value=${day}
-          ${value === true ? `checked` : ``}
+          ${value ? `checked` : ``}
         />
         <label class="card__repeat-day" for="repeat-${day}-1">${day}</label>
-        `).join(` `)}
+        `).join(``)}
       </div>
     </fieldset>
   </div>`;
@@ -77,7 +77,7 @@ const renderHashtag = (task) =>
         <input class='card__hashtag-hidden-input' type='hidden' name='hashtag' value='${currentTag}'>
         <button class='card__hashtag-name' type='button'>#${currentTag}</button>
         <button class='card__hashtag-delete'></button>
-      </span>`).join(` `)}
+      </span>`).join(``)}
     </div>
     <label>
       <input
@@ -120,7 +120,7 @@ const renderColors = (task) =>
         ${currentColor === task.color ? `checked` : ``}
       />
       <label for="color-${currentColor}-1" class="card__color card__color--${currentColor}">${currentColor}</label>
-      `).join(` `)}
+      `).join(``)}
     </div>
   </div>`;
 
