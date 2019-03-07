@@ -137,8 +137,8 @@ const renderStatusButtons = () =>
     <button class='card__delete' type='button'>delete</button>
   </div>`;
 
-export const createTask = (task) => {
-  boardTasksContainerElement.insertAdjacentHTML(`beforeend`, `<article class='card card--repeat card--black'>
+export const createTask = (task) =>
+  `<article class='card card--repeat card--black'>
     <form class='card__form' method='get'>
       <div class='card__inner'>
         ${renderControls(task)}
@@ -148,7 +148,5 @@ export const createTask = (task) => {
         ${renderStatusButtons()}
       </div>
     </form>
-  </article>`);
-};
+  </article>`;
 
-export const boardTasksContainerElement = document.querySelector(`.board__tasks`);
