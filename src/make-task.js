@@ -1,45 +1,36 @@
-const Color = {
-  BLACK: `black`,
-  YELLOW: `yellow`,
-  BLUE: `blue`,
-  GREEN: `green`,
-  PINK: `pink`
-};
+const Color = new Set([
+  `black`,
+  `yellow`,
+  `blue`,
+  `green`,
+  `pink`,
+]);
 
-const Day = {
-  MONDAY: `mo`,
-  TUESDAY: `tu`,
-  WEDNESDAY: `we`,
-  THURSDAY: `th`,
-  FRIDAY: `fr`,
-  SATURDAY: `sa`,
-  SUNDAY: `su`
-};
-
-const cardControlGenerate = () =>
+const renderControls = (task) =>
   `<div class='card__control'>
       <button class='card__btn card__btn--edit'>edit</button>
       <button class='card__btn card__btn--archive'>archive</button>
-      <button class='card__btn card__btn--favorites card__btn--disabled'>favorites</button>
+      <button class='card__btn card__btn--favorites ${task.isFavorite ? `` : `card__btn--disabled`}'>favorites</button>
   </div>`;
 
-const cardColorBarGenerate = () =>
+const renderColorBar = () =>
   `<div class='card__color-bar'>
       <svg width="100%" height="10">
         <use xlink:href="#wave"></use>
       </svg>
   </div>`;
 
-const cardTextareaGenerate = () =>
+const renderTextarea = (task) =>
   `<div class='card__textarea-wrap'>
       <label>
         <textarea class="card__text" placeholder="Start typing your text here..."
-          name="text">This is example of new task, you can add picture, set date and time, add tags.</textarea>
+          name="text">${task.title}</textarea>
       </label>
   </div>`;
 
-const cardDatesGenerate = () =>
-  `<div class="card__dates">
+const renderDates = (task) => {
+  const date = new Date(task.dueDate);
+  return `<div class="card__dates">
     <button class="card__date-deadline-toggle"
       type="button">date:<span class="card__date-status">no</span>
     </button>
@@ -47,14 +38,14 @@ const cardDatesGenerate = () =>
       <label class="card__input-deadline-wrap">
         <input class="card__date"
           type="text"
-          placeholder="23 September"
+          placeholder="${date.getDay() + 1} ${date.toLocaleString(`en-us`, {month: `long`})}"
           name="date"
           />
       </label>
       <label class="card__input-deadline-wrap">
         <input class="card__time"
           type="text"
-          placeholder="11:15 PM"
+          placeholder="${date.toLocaleString(`en-US`, {hour: `numeric`, hour12: true})}"
           name="time"
           />
       </label>
@@ -64,26 +55,30 @@ const cardDatesGenerate = () =>
     </button>
     <fieldset class="card__repeat-days" disabled>
       <div class="card__repeat-days-inner">
-        ${Object.values(Day).map((day) => `<input
+        ${Object.entries(task.repeatingDays).map(([day, value]) => `<input
           class="visually-hidden card__repeat-day-input"
           type="checkbox"
           id="repeat-${day}-1"
           name="repeat"
           value=${day}
+          ${value ? `checked` : ``}
         />
-        <label
-          class="card__repeat-day"
-          for="repeat-${day}-1"
-          >${day}
-        </label>
-        `)}
+        <label class="card__repeat-day" for="repeat-${day}-1">${day}</label>
+        `).join(``)}
       </div>
     </fieldset>
   </div>`;
+};
 
-const cardHashtagGenerate = () =>
+const renderHashtag = (task) =>
   `<div class="card__hashtag">
-    <div class="card__hashtag-list"></div>
+    <div class="card__hashtag-list">
+      ${[...task.tags].map((currentTag) => `<span class='card__hashtag-inner'>
+        <input class='card__hashtag-hidden-input' type='hidden' name='hashtag' value='${currentTag}'>
+        <button class='card__hashtag-name' type='button'>#${currentTag}</button>
+        <button class='card__hashtag-delete'></button>
+      </span>`).join(``)}
+    </div>
     <label>
       <input
         type="text"
@@ -94,80 +89,64 @@ const cardHashtagGenerate = () =>
     </label>
   </div>`;
 
-const cardDetailsGenerate = () => {
-  const cardDetailsElement = document.createElement(`div`);
-  cardDetailsElement.classList.add(`card__details`);
-
-  cardDetailsElement.insertAdjacentHTML(`beforeend`, cardDatesGenerate());
-  cardDetailsElement.insertAdjacentHTML(`beforeend`, cardHashtagGenerate());
-  return cardDetailsElement;
-};
-
-const cardSettingsGenerate = () => {
-  const cardSettingsElement = document.createElement(`div`);
-  cardSettingsElement.classList.add(`card__settings`);
-  cardSettingsElement.appendChild(cardDetailsGenerate());
-  cardSettingsElement.insertAdjacentHTML(`beforeend`, `<label
-    class="card__img-wrap card__img-wrap--empty">
-      <input
-        type="file"
-        class="card__img-input visually-hidden"
-        name="img"
-      />
-      <img
-        src="img/add-photo.svg"
-        alt="task picture"
-        class="card__img"
-      />
-    </label>
-    <div class='card__colors-inner'>
-      <h3 class="card__colors-title">Color</h3>
-      <div class='card__colors-wrap'>
-        ${Object.values(Color).map((color) => `<input
-          type="radio"
-          id="color-${color}-1"
-          class="card__color-input card__color-input--${color} visually-hidden"
-          name="color"
-          value="${color}"
-          checked
-        />
-        <label
-          for="color-${color}-1"
-          class="card__color card__color--${color}"
-          >${color}
-        </label>
-        `)}
-      </div>
-    </div>`);
-
-  return cardSettingsElement;
-};
-
-const cardStatusButtonsGenerate = () =>
-  `<div class= 'card__status-btns'>
-      <button class='card__save' type='button'>save</button>
-      <button class='card__delete' type='button'>delete</button>
+const renderDetails = (task) =>
+  `<div class='card__details'>
+    ${renderDates(task)}
+    ${renderHashtag(task)}
   </div>`;
 
-export const createTask = () => {
-  const cardElement = document.createElement(`article`);
-  cardElement.classList.add(`card`, `card--repeat`, `card--black`);
+const renderImage = (task) =>
+  `<label class="card__img-wrap card__img-wrap--empty">
+    <input
+      type="file"
+      class="card__img-input visually-hidden"
+      name="img"
+    />
+    <img
+      src="${task.picture}"
+      alt="task picture"
+      class="card__img"
+    />
+  </label>`;
 
-  const cardFormElement = document.createElement(`form`);
-  cardFormElement.classList.add(`card__form`);
-  cardFormElement.method = `get`;
+const renderColors = (task) =>
+  `<div class='card__colors-inner'>
+    <h3 class="card__colors-title">Color</h3>
+    <div class='card__colors-wrap'>
+      ${[...Color].map((currentColor) => `<input
+        type="radio" id="color-${currentColor}-1"
+        class="card__color-input card__color-input--${currentColor} visually-hidden"
+        name="color" value="${currentColor}"
+        ${currentColor === task.color ? `checked` : ``}
+      />
+      <label for="color-${currentColor}-1" class="card__color card__color--${currentColor}">${currentColor}</label>
+      `).join(``)}
+    </div>
+  </div>`;
 
-  const cardInnerElement = document.createElement(`div`);
-  cardInnerElement.classList.add(`card__inner`);
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardControlGenerate());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardColorBarGenerate());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardTextareaGenerate());
-  cardInnerElement.appendChild(cardSettingsGenerate());
-  cardInnerElement.insertAdjacentHTML(`beforeend`, cardStatusButtonsGenerate());
+const renderSettings = (task) =>
+  `<div class='card__settings'>
+    ${renderDetails(task)}
+    ${renderImage(task)}
+    ${renderColors(task)}
+  </div>`;
 
-  cardFormElement.appendChild(cardInnerElement);
-  cardElement.appendChild(cardFormElement);
-  boardTasksContainerElement.appendChild(cardElement);
-};
+const renderStatusButtons = () =>
+  `<div class= 'card__status-btns'>
+    <button class='card__save' type='button'>save</button>
+    <button class='card__delete' type='button'>delete</button>
+  </div>`;
 
-export const boardTasksContainerElement = document.querySelector(`.board__tasks`);
+export const createTask = (task) =>
+  `<article class='card card--repeat card--black'>
+    <form class='card__form' method='get'>
+      <div class='card__inner'>
+        ${renderControls(task)}
+        ${renderColorBar()}
+        ${renderTextarea(task)}
+        ${renderSettings(task)}
+        ${renderStatusButtons()}
+      </div>
+    </form>
+  </article>`;
+
