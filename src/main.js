@@ -20,11 +20,11 @@ const FilterName = new Set([
 ]);
 
 const addRandomCountOfTask = (taskCount) => {
-  let tempTasksList = [];
+  let fragment = document.createDocumentFragment();
   for (let i = 0; i < taskCount; i++) {
-    tempTasksList[i] = tasks[i];
+    fragment.appendChild(tasks[i]);
   }
-  boardTasksContainerElement.insertAdjacentHTML(`beforeend`, tempTasksList.join(``));
+  boardTasksContainerElement.appendChild(fragment);
 };
 
 const filterClickHandler = (evt) => {
@@ -34,13 +34,28 @@ const filterClickHandler = (evt) => {
   }
 };
 
-// const createTasks = () => {
-//   let tasks = [];
-//   for (let i = 0; i < TASK_COUNT; i++) {
-//     tasks[i] = createTask(task);
-//   }
-//   return tasks;
-// };
+const createTasks = () => {
+  let tasks = [];
+  for (let i = 0; i < TASK_COUNT; i++) {
+    const taskComponent = new Task(task);
+    const editTaskComponent = new TaskEdit(task);
+
+    taskComponent.onEdit = () => {
+      editTaskComponent.render();
+      boardTasksContainerElement.replaceChild(editTaskComponent.element, taskComponent.element);
+      taskComponent.unrender();
+    };
+
+    editTaskComponent.onSubmit = () => {
+      taskComponent.render();
+      boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
+      editTaskComponent.unrender();
+    };
+
+    tasks[i] = taskComponent.render();
+  }
+  return tasks;
+};
 
 const createFilters = () => {
   let filters = [];
@@ -50,30 +65,14 @@ const createFilters = () => {
   return filters;
 };
 
+const boardTasksContainerElement = document.querySelector(`.board__tasks`);
 
-// const tasks = createTasks();
+const tasks = createTasks();
 const filters = createFilters();
 
-
-const boardTasksContainerElement = document.querySelector(`.board__tasks`);
-// boardTasksContainerElement.insertAdjacentHTML(`beforeend`, tasks.join(``));
-
-const taskComponent = new Task(task);
-const editTaskComponent = new TaskEdit(task);
-
-boardTasksContainerElement.appendChild(taskComponent.render());
-
-taskComponent.onEdit = () => {
-  editTaskComponent.render();
-  boardTasksContainerElement.replaceChild(editTaskComponent.element, taskComponent.element);
-  taskComponent.unrender();
-};
-
-editTaskComponent.onSubmit = () => {
-  taskComponent.render();
-  boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
-  editTaskComponent.unrender();
-};
+for (const it of tasks) {
+  boardTasksContainerElement.appendChild(it);
+}
 
 const filterContainerElement = document.querySelector(`.main__filter`);
 filterContainerElement.addEventListener(`click`, filterClickHandler);
