@@ -1,8 +1,9 @@
-import {createTask} from './make-task.js';
 import {createFilter} from './make-filter.js';
 import {getRandomInt} from './util.js';
 import {removeAllElementsByClass} from './util.js';
 import {task} from './data.js';
+import Task from './task.js';
+import TaskEdit from './task-edit.js';
 
 const TASK_COUNT = 7;
 const TASK_COUNT_MIN = 1;
@@ -33,13 +34,13 @@ const filterClickHandler = (evt) => {
   }
 };
 
-const createTasks = () => {
-  let tasks = [];
-  for (let i = 0; i < TASK_COUNT; i++) {
-    tasks[i] = createTask(task);
-  }
-  return tasks;
-};
+// const createTasks = () => {
+//   let tasks = [];
+//   for (let i = 0; i < TASK_COUNT; i++) {
+//     tasks[i] = createTask(task);
+//   }
+//   return tasks;
+// };
 
 const createFilters = () => {
   let filters = [];
@@ -49,11 +50,30 @@ const createFilters = () => {
   return filters;
 };
 
-const tasks = createTasks();
+
+// const tasks = createTasks();
 const filters = createFilters();
 
+
 const boardTasksContainerElement = document.querySelector(`.board__tasks`);
-boardTasksContainerElement.insertAdjacentHTML(`beforeend`, tasks.join(``));
+// boardTasksContainerElement.insertAdjacentHTML(`beforeend`, tasks.join(``));
+
+const taskComponent = new Task(task);
+const editTaskComponent = new TaskEdit(task);
+
+boardTasksContainerElement.appendChild(taskComponent.render());
+
+taskComponent.onEdit = () => {
+  editTaskComponent.render();
+  boardTasksContainerElement.replaceChild(editTaskComponent.element, taskComponent.element);
+  taskComponent.unrender();
+};
+
+editTaskComponent.onSubmit = () => {
+  taskComponent.render();
+  boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
+  editTaskComponent.unrender();
+};
 
 const filterContainerElement = document.querySelector(`.main__filter`);
 filterContainerElement.addEventListener(`click`, filterClickHandler);
