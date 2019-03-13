@@ -226,11 +226,4 @@ export default class TaskEdit {
     this.unbind();
     this._element = null;
   }
-
-  update() {
-    if (this._state.isEdit) {
-      return this._element.classList.add(`card--edit`);
-    }
-    return this._element.classList.remove(`card--edit`);
-  }
 }

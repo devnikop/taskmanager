@@ -20,7 +20,7 @@ const FilterName = new Set([
 ]);
 
 const addRandomCountOfTask = (taskCount) => {
-  let fragment = document.createDocumentFragment();
+  const fragment = document.createDocumentFragment();
   for (let i = 0; i < taskCount; i++) {
     fragment.appendChild(tasks[i]);
   }
