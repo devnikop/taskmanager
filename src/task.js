@@ -12,11 +12,9 @@ export default class Task {
     this._isDone = data.isDone;
 
     this._element = null;
-    this._state = {
-    };
-
+    this._buttonEditElement = null;
     this._onEdit = null;
-    this._onEditButtonClick = null;
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
   get template() {
@@ -132,12 +130,12 @@ export default class Task {
   }
 
   bind() {
-    this._onEditButtonClick = this._onEditButtonClick.bind(this);
-    this._element.querySelector(`.card__btn--edit`).addEventListener(`click`, this._onEditButtonClick);
+    this._buttonEditElement = this._element.querySelector(`.card__btn--edit`);
+    this._buttonEditElement.addEventListener(`click`, this._onEditButtonClick);
   }
 
   unbind() {
-    this._element.querySelector(`.card__btn--edit`).removeEventListener(`click`, this._onEditButtonClick);
+    this._buttonEditElement.removeEventListener(`click`, this._onEditButtonClick);
   }
 
   render() {

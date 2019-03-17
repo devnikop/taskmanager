@@ -20,8 +20,9 @@ export default class TaskEdit {
     this._isDone = data.isDone;
 
     this._element = null;
+    this._saveButtonElement = null;
     this._onSubmit = null;
-    this._submitButtonEventBind = null;
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
   }
 
   get template() {
@@ -208,12 +209,12 @@ export default class TaskEdit {
   }
 
   bind() {
-    this._submitButtonEventBind = this._onSubmitButtonClick.bind(this);
-    this._element.querySelector(`.card__save`).addEventListener(`click`, this._submitButtonEventBind);
+    this._saveButtonElement = this._element.querySelector(`.card__save`);
+    this._saveButtonElement.addEventListener(`click`, this._onSubmitButtonClick);
   }
 
   unbind() {
-    this._element.querySelector(`.card__save`).removeEventListener(`click`, this._submitButtonEventBind);
+    this._saveButtonElement.removeEventListener(`click`, this._onSubmitButtonClick);
   }
 
   render() {
