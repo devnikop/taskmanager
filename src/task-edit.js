@@ -10,15 +10,9 @@ const Color = new Set([
 
 export default class TaskEdit extends Component {
   constructor(data) {
-    super();
-    this._title = data.title;
+    super(data);
     this._dueDate = data.dueDate;
-    this._tags = data.tags;
-    this._picture = data.picture;
     this._color = data.color;
-    this._repeatingDays = data.repeatingDays;
-    this._isFavorite = data.isFavorite;
-    this._isDone = data.isDone;
 
     this._saveButtonElement = null;
     this._onSubmit = null;
@@ -38,34 +32,6 @@ export default class TaskEdit extends Component {
         </div>
       </form>
     </article>`.trim();
-  }
-
-  _renderControls() {
-    return `
-    <div class='card__control'>
-      <button class='card__btn card__btn--edit'>edit</button>
-      <button class='card__btn card__btn--archive'>archive</button>
-      <button class='card__btn card__btn--favorites ${this._isFavorite ? `` : `card__btn--disabled`}'>favorites</button>
-    </div>`;
-  }
-
-  _renderColorBar() {
-    return `
-    <div class='card__color-bar'>
-      <svg width="100%" height="10">
-        <use xlink:href="#wave"></use>
-      </svg>
-    </div>`;
-  }
-
-  _renderTextarea() {
-    return `
-    <div class='card__textarea-wrap'>
-      <label>
-        <textarea class="card__text" placeholder="Start typing your text here..."
-          name="text">${this._title}</textarea>
-      </label>
-    </div>`;
   }
 
   _renderDates() {
@@ -111,50 +77,12 @@ export default class TaskEdit extends Component {
     </div>`;
   }
 
-  _renderHashtag() {
-    return `
-    <div class="card__hashtag">
-      <div class="card__hashtag-list">
-        ${Array.from(this._tags).map((currentTag) => `
-          <span class='card__hashtag-inner'>
-            <input class='card__hashtag-hidden-input' type='hidden' name='hashtag' value='${currentTag}'>
-            <button class='card__hashtag-name' type='button'>#${currentTag}</button>
-            <button class='card__hashtag-delete'></button>
-          </span>`).join(``)}
-      </div>
-      <label>
-        <input
-          type="text"
-          class="card__hashtag-input"
-          name="hashtag-input"
-          placeholder="Type new hashtag here"
-        />
-      </label>
-    </div>`;
-  }
-
   _renderDetails() {
     return `
     <div class='card__details'>
       ${this._renderDates()}
       ${this._renderHashtag()}
     </div>`;
-  }
-
-  _renderImage() {
-    return `
-    <label class="card__img-wrap card__img-wrap--empty">
-      <input
-        type="file"
-        class="card__img-input visually-hidden"
-        name="img"
-      />
-      <img
-        src="${this._picture}"
-        alt="task picture"
-        class="card__img"
-      />
-    </label>`;
   }
 
   _renderColors() {
@@ -194,10 +122,6 @@ export default class TaskEdit extends Component {
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
     return typeof this._onSubmit === `function` && this._onSubmit();
-  }
-
-  _isRepeated() {
-    return Object.values(this._repeatingDays).some((it) => it);
   }
 
   set onSubmit(fn) {
