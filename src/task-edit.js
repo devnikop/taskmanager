@@ -1,4 +1,4 @@
-import {createElement} from './util.js';
+import {Component} from './component.js';
 
 const Color = new Set([
   `black`,
@@ -8,8 +8,9 @@ const Color = new Set([
   `pink`,
 ]);
 
-export default class TaskEdit {
+export default class TaskEdit extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._dueDate = data.dueDate;
     this._tags = data.tags;
@@ -19,7 +20,6 @@ export default class TaskEdit {
     this._isFavorite = data.isFavorite;
     this._isDone = data.isDone;
 
-    this._element = null;
     this._saveButtonElement = null;
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
@@ -204,10 +204,6 @@ export default class TaskEdit {
     this._onSubmit = fn;
   }
 
-  get element() {
-    return this._element;
-  }
-
   bind() {
     this._saveButtonElement = this._element.querySelector(`.card__save`);
     this._saveButtonElement.addEventListener(`click`, this._onSubmitButtonClick);
@@ -215,16 +211,5 @@ export default class TaskEdit {
 
   unbind() {
     this._saveButtonElement.removeEventListener(`click`, this._onSubmitButtonClick);
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }
