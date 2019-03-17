@@ -16,7 +16,7 @@ export default class Task {
     };
 
     this._onEdit = null;
-    this._editButtonEventBind = null;
+    this._onEditButtonClick = null;
   }
 
   get template() {
@@ -132,12 +132,12 @@ export default class Task {
   }
 
   bind() {
-    this._editButtonEventBind = this._onEditButtonClick.bind(this);
-    this._element.querySelector(`.card__btn--edit`).addEventListener(`click`, this._editButtonEventBind);
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
+    this._element.querySelector(`.card__btn--edit`).addEventListener(`click`, this._onEditButtonClick);
   }
 
   unbind() {
-    this._element.querySelector(`.card__btn--edit`).removeEventListener(`click`, this._editButtonEventBind);
+    this._element.querySelector(`.card__btn--edit`).removeEventListener(`click`, this._onEditButtonClick);
   }
 
   render() {
