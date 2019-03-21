@@ -1,4 +1,4 @@
-import {getRandomInt} from './util.js';
+import {getRandomInt} from './util';
 
 const FILTER_COUNT_MIN = 0;
 const FILTER_COUNT_MAX = 200;

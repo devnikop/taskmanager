@@ -9,11 +9,14 @@ export class Component {
     this._title = data.title;
     this._tags = data.tags;
     this._picture = data.picture;
+    this._dueDate = data.dueDate;
+    this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._isFavorite = data.isFavorite;
     this._isDone = data.isDone;
 
     this._element = null;
+    this._state = {};
   }
 
   _renderControls() {
@@ -21,7 +24,7 @@ export class Component {
     <div class='card__control'>
       <button class='card__btn card__btn--edit'>edit</button>
       <button class='card__btn card__btn--archive'>archive</button>
-      <button class='card__btn card__btn--favorites ${this._isFavorite ? `` : `card__btn--disabled`}'>favorites</button>
+      <button class='card__btn card__btn--favorites ${this._isFavorite || `card__btn--disabled`}'>favorites</button>
     </div>`;
   }
 
@@ -109,4 +112,6 @@ export class Component {
     this._element.remove();
     this._element = null;
   }
+
+  update() {}
 }
