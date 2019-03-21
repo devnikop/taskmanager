@@ -11,7 +11,7 @@ export default class Task extends Component {
 
   get template() {
     return `
-    <article class='card card--black ${this._isRepeated() ? `card--repeat` : ``}'>
+    <article class='card card--${this._color} ${this._isRepeated() && `card--repeat`}'>
       <form class='card__form' method='get'>
         <div class='card__inner'>
           ${this._renderControls()}
@@ -54,5 +54,12 @@ export default class Task extends Component {
 
   unbind() {
     this._buttonEditElement.removeEventListener(`click`, this._onEditButtonClick);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
   }
 }

@@ -23,7 +23,13 @@ export const task = {
     `keks`
   ]),
   picture: `http://picsum.photos/100/100?r=${Math.random()}`,
-  color: `green`,
+  color: [
+    `black`,
+    `yellow`,
+    `blue`,
+    `pink`,
+    `green`
+  ][Math.floor(Math.random() * 3)],
   repeatingDays: {
     'mo': true,
     'tu': false,
