@@ -1,9 +1,4 @@
-const Time = new Map([
-  [`HOURS`, 24],
-  [`MINUTES`, 60],
-  [`SECONDS`, 60],
-  [`MILLISECONDS`, 1000],
-]);
+import moment from '../node_modules/moment';
 
 export const task = {
   title: [
@@ -11,8 +6,7 @@ export const task = {
     `Just do homework`,
     `Finish intensive on a hundred points`
   ][Math.floor(Math.random() * 3)],
-  dueDate: +Date.now() + 1 + Math.floor(Math.random() * 7)
-    * Time.get(`HOURS`) * Time.get(`MINUTES`) * Time.get(`SECONDS`) * Time.get(`MILLISECONDS`),
+  dueDate: moment().add(Math.floor(Math.random() * 7), `days`),
   tags: new Set([
     `cinema`,
     `myself`,
