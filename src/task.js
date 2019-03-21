@@ -1,4 +1,4 @@
-import {Component} from './component.js';
+import {Component} from './component';
 
 export default class Task extends Component {
   constructor(data) {
@@ -21,13 +21,6 @@ export default class Task extends Component {
         </div>
       </form>
     </article>`.trim();
-  }
-
-  _renderDetails() {
-    return `
-    <div class='card__details'>
-      ${this._renderHashtag()}
-    </div>`;
   }
 
   _renderSettings() {

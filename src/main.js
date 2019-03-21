@@ -1,9 +1,9 @@
-import {createFilter} from './make-filter.js';
-import {getRandomInt} from './util.js';
-import {removeAllElementsByClass} from './util.js';
-import {task} from './data.js';
-import Task from './task.js';
-import TaskEdit from './task-edit.js';
+import {createFilter} from './make-filter';
+import {getRandomInt} from './util';
+import {removeAllElementsByClass} from './util';
+import {task} from './data';
+import Task from './task';
+import TaskEdit from './task-edit';
 
 const TASK_COUNT = 7;
 const TASK_COUNT_MIN = 1;

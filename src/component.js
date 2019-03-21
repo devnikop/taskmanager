@@ -46,6 +46,49 @@ export class Component {
     </div>`;
   }
 
+  _renderDates() {
+    const date = new Date(this._dueDate);
+    return `
+    <div class="card__dates">
+      <button class="card__date-deadline-toggle"
+        type="button">date:<span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
+      </button>
+      <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
+        <label class="card__input-deadline-wrap">
+          <input class="card__date"
+            type="text"
+            placeholder="${date.getDay() + 1} ${date.toLocaleString(`en-us`, {month: `long`})}"
+            name="date"
+            />
+        </label>
+        <label class="card__input-deadline-wrap">
+          <input class="card__time"
+            type="text"
+            placeholder="${date.toLocaleString(`en-US`, {hour: `numeric`, hour12: true})}"
+            name="time"
+            />
+        </label>
+      </fieldset>
+      <button class="card__repeat-toggle"
+        type="button">repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
+      </button>
+      <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>
+        <div class="card__repeat-days-inner">
+          ${Object.entries(this._repeatingDays).map(([day, value]) => `<input
+            class="visually-hidden card__repeat-day-input"
+            type="checkbox"
+            id="repeat-${day}-1"
+            name="repeat"
+            value=${day}
+            ${value && `checked`}
+          />
+          <label class="card__repeat-day" for="repeat-${day}-1">${day}</label>
+          `).join(``)}
+        </div>
+      </fieldset>
+    </div>`;
+  }
+
   _renderHashtag() {
     return `
     <div class="card__hashtag">
@@ -65,6 +108,14 @@ export class Component {
           placeholder="Type new hashtag here"
         />
       </label>
+    </div>`;
+  }
+
+  _renderDetails() {
+    return `
+    <div class='card__details'>
+      ${this._renderDates()}
+      ${this._renderHashtag()}
     </div>`;
   }
 
