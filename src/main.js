@@ -1,11 +1,10 @@
 import {createFilter} from './make-filter';
-import {getRandomInt} from './util';
-import {removeAllElementsByClass} from './util';
-import {task} from './data';
+import {getRandomInt, removeAll} from './util';
+import {taskList} from './data';
 import Task from './task';
 import TaskEdit from './task-edit';
+import _ from '../node_modules/lodash';
 
-const TASK_COUNT = 7;
 const TASK_COUNT_MIN = 1;
 const TASK_COUNT_MAX = 7;
 
@@ -29,16 +28,17 @@ const addRandomCountOfTask = (taskCount) => {
 
 const filterClickHandler = (evt) => {
   if (evt.target.matches(`.filter__input`)) {
-    removeAllElementsByClass(document.querySelectorAll(`.board__tasks .card`));
+    removeAll(document.querySelectorAll(`.board__tasks .card`));
     addRandomCountOfTask(getRandomInt(TASK_COUNT_MIN, TASK_COUNT_MAX));
   }
 };
 
 const createTasks = () => {
   let tasks = [];
-  for (let i = 0; i < TASK_COUNT; i++) {
-    const taskComponent = new Task(task);
-    const editTaskComponent = new TaskEdit(task);
+  for (let i = 0; i < taskList.length; i++) {
+    const task = taskList[i];
+    const taskComponent = new Task(_.cloneDeep(task));
+    const editTaskComponent = new TaskEdit(_.cloneDeep(task));
 
     taskComponent.onEdit = () => {
       editTaskComponent.render();
@@ -53,7 +53,7 @@ const createTasks = () => {
       task.repeatingDays = newObject.repeatingDays;
       task.dueDate = newObject.dueDate;
 
-      taskComponent.update(task);
+      taskComponent.update(_.cloneDeep(task));
       taskComponent.render();
       boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();

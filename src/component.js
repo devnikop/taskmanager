@@ -24,14 +24,14 @@ export class Component {
     <div class='card__control'>
       <button class='card__btn card__btn--edit'>edit</button>
       <button class='card__btn card__btn--archive'>archive</button>
-      <button class='card__btn card__btn--favorites ${this._isFavorite || `card__btn--disabled`}'>favorites</button>
+      <button class='card__btn card__btn--favorites ${this._isFavorite ? `` : `card__btn--disabled`}'>favorites</button>
     </div>`;
   }
 
   _renderColorBar() {
     return `
     <div class='card__color-bar'>
-      <svg width="100%" height="10">
+      <svg class="card__color-bar-wave" width="100%" height="10">
         <use xlink:href="#wave"></use>
       </svg>
     </div>`;
@@ -83,6 +83,10 @@ export class Component {
         class="card__img"
       />
     </label>`;
+  }
+
+  _hasDate() {
+    return this._dueDate !== ``;
   }
 
   _isRepeated() {

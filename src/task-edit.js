@@ -17,8 +17,8 @@ export default class TaskEdit extends Component {
 
     this._onSubmit = null;
 
-    this._state.isDate = false;
-    this._state.isRepeated = false;
+    this._state.isDate = this._hasDate();
+    this._state.isRepeated = this._isRepeated();
 
     this._cardFormElement = null;
     this._dateToggleElement = null;
@@ -32,7 +32,7 @@ export default class TaskEdit extends Component {
 
   get template() {
     return `
-    <article class='card card--${this._color} card--edit ${this._isRepeated() && `card--repeat`}'>
+    <article class='card card--${this._color} card--edit ${this._isRepeated() ? `card--repeat` : ``}'>
       <form class='card__form' method='get'>
         <div class='card__inner'>
           ${this._renderControls()}
@@ -51,7 +51,7 @@ export default class TaskEdit extends Component {
       <button class="card__date-deadline-toggle"
         type="button">date:<span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
       </button>
-      <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
+      <fieldset class="card__date-deadline" ${!this._state.isDate ? `hidden` : ``}>
         <label class="card__input-deadline-wrap">
           <input class="card__date"
             type="text"
@@ -72,7 +72,7 @@ export default class TaskEdit extends Component {
       <button class="card__repeat-toggle"
         type="button">repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
       </button>
-      <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>
+      <fieldset class="card__repeat-days" ${!this._state.isRepeated ? `disabled` : ``}>
         <div class="card__repeat-days-inner">
           ${Object.entries(this._repeatingDays).map(([day, value]) => `<input
             class="visually-hidden card__repeat-day-input"
@@ -106,7 +106,7 @@ export default class TaskEdit extends Component {
           type="radio" id="color-${currentColor}-1"
           class="card__color-input card__color-input--${currentColor} visually-hidden"
           name="color" value="${currentColor}"
-          ${currentColor === this._color && `checked`}
+          ${currentColor === this._color ? `checked` : ``}
         />
         <label for="color-${currentColor}-1" class="card__color card__color--${currentColor}">${currentColor}</label>
         `).join(``)}
@@ -136,7 +136,7 @@ export default class TaskEdit extends Component {
       title: ``,
       color: ``,
       tags: new Set(),
-      dueDate: new Date(),
+      dueDate: ``,
       repeatingDays: {
         'mo': false,
         'tu': false,
@@ -210,7 +210,8 @@ export default class TaskEdit extends Component {
       const timeInputElement = this._element.querySelector(`.card__time`);
 
       flatpickr(dateInputElement, {onChange: this._dataUpdate, altInput: true, altFormat: `j F`, dateFormat: `j F`});
-      flatpickr(timeInputElement, {onChange: this._dataUpdate, enableTime: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+      // eslint-disable-next-line camelcase
+      flatpickr(timeInputElement, {onChange: this._dataUpdate, time_24hr: true, enableTime: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
     }
   }
 
