@@ -16,15 +16,18 @@ export default class TaskEdit extends Component {
     super(data);
 
     this._onSubmit = null;
+    this._onDelete = null;
 
     this._state.isDate = this._hasDate();
     this._state.isRepeated = this._isRepeated();
 
     this._cardFormElement = null;
+    this._deleteButtonElement = null;
     this._dateToggleElement = null;
     this._repeatToggleElement = null;
 
     this._onCardFormSubmit = this._onCardFormSubmit.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
     this._dataUpdate = this._dataUpdate.bind(this);
@@ -131,6 +134,14 @@ export default class TaskEdit extends Component {
     </div>`;
   }
 
+  set onSubmit(fn) {
+    this._onSubmit = fn;
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
   _processForm(formData) {
     const entry = {
       title: ``,
@@ -165,6 +176,11 @@ export default class TaskEdit extends Component {
     return typeof this._onSubmit === `function` && this._onSubmit(newData);
   }
 
+  _onDeleteButtonClick(evt) {
+    evt.preventDefault();
+    return typeof this._onDelete === `function` && this._onDelete();
+  }
+
   _onChangeDate() {
     this._state.isDate = !this._state.isDate;
     this.unbind();
@@ -192,16 +208,14 @@ export default class TaskEdit extends Component {
     this._element.innerHTML = this.template;
   }
 
-  set onSubmit(fn) {
-    this._onSubmit = fn;
-  }
-
   bind() {
     this._cardFormElement = this._element.querySelector(`.card__form`);
+    this._deleteButtonElement = this.element.querySelector(`.card__delete`);
     this._dateToggleElement = this._element.querySelector(`.card__date-deadline-toggle`);
     this._repeatToggleElement = this._element.querySelector(`.card__repeat-toggle`);
 
     this._cardFormElement.addEventListener(`submit`, this._onCardFormSubmit);
+    this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClick);
     this._dateToggleElement.addEventListener(`click`, this._onChangeDate);
     this._repeatToggleElement.addEventListener(`click`, this._onChangeRepeated);
 
@@ -217,6 +231,7 @@ export default class TaskEdit extends Component {
 
   unbind() {
     this._cardFormElement.removeEventListener(`submit`, this._onCardFormSubmit);
+    this._deleteButtonElement.removeEventListener(`click`, this._onDeleteButtonClick);
     this._dateToggleElement.removeEventListener(`click`, this._onChangeDate);
     this._repeatToggleElement.removeEventListener(`click`, this._onChangeRepeated);
   }

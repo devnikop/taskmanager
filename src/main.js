@@ -36,6 +36,10 @@ const filterClickHandler = (evt) => {
 const createTasks = () => {
   let tasks = [];
   for (let i = 0; i < taskList.length; i++) {
+    if (taskList[i] === `deleted`) {
+      tasks[i] = `deleted`;
+      continue;
+    }
     const task = taskList[i];
     const taskComponent = new Task(_.cloneDeep(task));
     const editTaskComponent = new TaskEdit(_.cloneDeep(task));
@@ -47,16 +51,18 @@ const createTasks = () => {
     };
 
     editTaskComponent.onSubmit = (newObject) => {
-      task.title = newObject.title;
-      task.tags = newObject.tags;
-      task.color = newObject.color;
-      task.repeatingDays = newObject.repeatingDays;
-      task.dueDate = newObject.dueDate;
+      const updatedTask = Object.assign({}, task, newObject);
 
-      taskComponent.update(_.cloneDeep(task));
+      taskComponent.update(_.cloneDeep(updatedTask));
       taskComponent.render();
       boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
+    };
+
+    editTaskComponent.onDelete = () => {
+      removeAll(document.querySelectorAll(`.board__tasks .card`));
+      taskList[i] = `deleted`;
+      appendTasks(createTasks());
     };
 
     tasks[i] = taskComponent.render();
@@ -72,14 +78,20 @@ const createFilters = () => {
   return filters;
 };
 
+const appendTasks = (tasks) => {
+  for (const task of tasks) {
+    if (task !== `deleted`) {
+      boardTasksContainerElement.appendChild(task);
+    }
+  }
+};
+
 const boardTasksContainerElement = document.querySelector(`.board__tasks`);
 
 const tasks = createTasks();
-const filters = createFilters();
+appendTasks(tasks);
 
-for (const it of tasks) {
-  boardTasksContainerElement.appendChild(it);
-}
+const filters = createFilters();
 
 const filterContainerElement = document.querySelector(`.main__filter`);
 filterContainerElement.addEventListener(`click`, filterClickHandler);
