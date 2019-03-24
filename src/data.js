@@ -9,7 +9,7 @@ const createTaskData = () => {
       `Just do homework`,
       `Finish intensive on a hundred points`
     ][Math.floor(Math.random() * 3)],
-    dueDate: moment().add(Math.floor(Math.random() * 7), `days`).add(Math.floor(Math.random() * 150), `minutes`),
+    dueDate: moment().add(Math.floor(Math.random() * 7), `days`).subtract(Math.floor(Math.random() * 1500), `minutes`),
     tags: new Set([
       `cinema`,
       `myself`,
@@ -31,7 +31,7 @@ const createTaskData = () => {
       'mo': false,
       'tu': false,
       'we': false,
-      'th': true,
+      'th': false,
       'fr': false,
       'sa': false,
       'su': false

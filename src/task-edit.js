@@ -250,8 +250,10 @@ export default class TaskEdit extends TaskComponent {
       text: (value) => target.title = value,
       color: (value) => target.color = value,
       repeat: (value) => target.repeatingDays[value] = true,
-      date: (value) => target.dueDate = moment(value).format(`D MMMM`),
-      time: (value) => target.dueDate += value,
+      date: (value) => target.dueDate = moment(value, [`D MMMM`]),
+      time: (value) => target.dueDate = moment(target.dueDate)
+        .add(moment(value, `k:m`).format(`k`), `hour`)
+        .add(moment(value, `k:m`).format(`m`), `minute`),
     };
   }
 }
