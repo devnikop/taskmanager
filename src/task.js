@@ -1,7 +1,7 @@
-import {Component} from './component';
+import {TaskComponent} from './task-component';
 import moment from '../node_modules/moment';
 
-export default class Task extends Component {
+export default class Task extends TaskComponent {
   constructor(data) {
     super(data);
 

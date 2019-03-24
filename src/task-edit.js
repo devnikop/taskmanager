@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import {Component} from './component';
+import {TaskComponent} from './task-component';
 import flatpickr from '../node_modules/flatpickr';
 import moment from '../node_modules/moment';
 
@@ -11,7 +11,7 @@ const Color = new Set([
   `pink`,
 ]);
 
-export default class TaskEdit extends Component {
+export default class TaskEdit extends TaskComponent {
   constructor(data) {
     super(data);
 
