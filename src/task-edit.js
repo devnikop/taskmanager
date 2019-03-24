@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import {Component} from './component';
+import {TaskComponent} from './task-component';
 import flatpickr from '../node_modules/flatpickr';
 import moment from '../node_modules/moment';
 
@@ -11,20 +11,23 @@ const Color = new Set([
   `pink`,
 ]);
 
-export default class TaskEdit extends Component {
+export default class TaskEdit extends TaskComponent {
   constructor(data) {
     super(data);
 
     this._onSubmit = null;
+    this._onDelete = null;
 
-    this._state.isDate = false;
-    this._state.isRepeated = false;
+    this._state.isDate = this._hasDate();
+    this._state.isRepeated = this._isRepeated();
 
     this._cardFormElement = null;
+    this._deleteButtonElement = null;
     this._dateToggleElement = null;
     this._repeatToggleElement = null;
 
     this._onCardFormSubmit = this._onCardFormSubmit.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
     this._dataUpdate = this._dataUpdate.bind(this);
@@ -32,7 +35,7 @@ export default class TaskEdit extends Component {
 
   get template() {
     return `
-    <article class='card card--${this._color} card--edit ${this._isRepeated() && `card--repeat`}'>
+    <article class='card card--${this._color} card--edit ${this._isRepeated() ? `card--repeat` : ``}'>
       <form class='card__form' method='get'>
         <div class='card__inner'>
           ${this._renderControls()}
@@ -51,7 +54,7 @@ export default class TaskEdit extends Component {
       <button class="card__date-deadline-toggle"
         type="button">date:<span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
       </button>
-      <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
+      <fieldset class="card__date-deadline" ${!this._state.isDate ? `hidden` : ``}>
         <label class="card__input-deadline-wrap">
           <input class="card__date"
             type="text"
@@ -72,7 +75,7 @@ export default class TaskEdit extends Component {
       <button class="card__repeat-toggle"
         type="button">repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
       </button>
-      <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>
+      <fieldset class="card__repeat-days" ${!this._state.isRepeated ? `disabled` : ``}>
         <div class="card__repeat-days-inner">
           ${Object.entries(this._repeatingDays).map(([day, value]) => `<input
             class="visually-hidden card__repeat-day-input"
@@ -106,7 +109,7 @@ export default class TaskEdit extends Component {
           type="radio" id="color-${currentColor}-1"
           class="card__color-input card__color-input--${currentColor} visually-hidden"
           name="color" value="${currentColor}"
-          ${currentColor === this._color && `checked`}
+          ${currentColor === this._color ? `checked` : ``}
         />
         <label for="color-${currentColor}-1" class="card__color card__color--${currentColor}">${currentColor}</label>
         `).join(``)}
@@ -131,12 +134,20 @@ export default class TaskEdit extends Component {
     </div>`;
   }
 
+  set onSubmit(fn) {
+    this._onSubmit = fn;
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
   _processForm(formData) {
     const entry = {
       title: ``,
       color: ``,
       tags: new Set(),
-      dueDate: new Date(),
+      dueDate: ``,
       repeatingDays: {
         'mo': false,
         'tu': false,
@@ -163,6 +174,11 @@ export default class TaskEdit extends Component {
     evt.preventDefault();
     const newData = this._dataUpdate();
     return typeof this._onSubmit === `function` && this._onSubmit(newData);
+  }
+
+  _onDeleteButtonClick(evt) {
+    evt.preventDefault();
+    return typeof this._onDelete === `function` && this._onDelete();
   }
 
   _onChangeDate() {
@@ -192,16 +208,14 @@ export default class TaskEdit extends Component {
     this._element.innerHTML = this.template;
   }
 
-  set onSubmit(fn) {
-    this._onSubmit = fn;
-  }
-
   bind() {
     this._cardFormElement = this._element.querySelector(`.card__form`);
+    this._deleteButtonElement = this.element.querySelector(`.card__delete`);
     this._dateToggleElement = this._element.querySelector(`.card__date-deadline-toggle`);
     this._repeatToggleElement = this._element.querySelector(`.card__repeat-toggle`);
 
     this._cardFormElement.addEventListener(`submit`, this._onCardFormSubmit);
+    this._deleteButtonElement.addEventListener(`click`, this._onDeleteButtonClick);
     this._dateToggleElement.addEventListener(`click`, this._onChangeDate);
     this._repeatToggleElement.addEventListener(`click`, this._onChangeRepeated);
 
@@ -210,12 +224,14 @@ export default class TaskEdit extends Component {
       const timeInputElement = this._element.querySelector(`.card__time`);
 
       flatpickr(dateInputElement, {onChange: this._dataUpdate, altInput: true, altFormat: `j F`, dateFormat: `j F`});
-      flatpickr(timeInputElement, {onChange: this._dataUpdate, enableTime: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+      // eslint-disable-next-line camelcase
+      flatpickr(timeInputElement, {onChange: this._dataUpdate, time_24hr: true, enableTime: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
     }
   }
 
   unbind() {
     this._cardFormElement.removeEventListener(`submit`, this._onCardFormSubmit);
+    this._deleteButtonElement.removeEventListener(`click`, this._onDeleteButtonClick);
     this._dateToggleElement.removeEventListener(`click`, this._onChangeDate);
     this._repeatToggleElement.removeEventListener(`click`, this._onChangeRepeated);
   }
@@ -234,8 +250,10 @@ export default class TaskEdit extends Component {
       text: (value) => target.title = value,
       color: (value) => target.color = value,
       repeat: (value) => target.repeatingDays[value] = true,
-      date: (value) => target.dueDate = moment(value).format(`D MMMM`),
-      time: (value) => target.dueDate += value,
+      date: (value) => target.dueDate = moment(value, [`D MMMM`]),
+      time: (value) => target.dueDate = moment(target.dueDate)
+        .add(moment(value, `k:m`).format(`k`), `hour`)
+        .add(moment(value, `k:m`).format(`m`), `minute`),
     };
   }
 }

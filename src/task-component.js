@@ -1,11 +1,12 @@
-import {createElement} from "./util";
+import {BaseComponent} from './base-component';
 
-export class Component {
+export class TaskComponent extends BaseComponent {
   constructor(data) {
-    if (new.target === Component) {
+    if (new.target === TaskComponent) {
       throw new Error(`Can't instantiate BaseComponent, only concrete one.`);
     }
 
+    super();
     this._title = data.title;
     this._tags = data.tags;
     this._picture = data.picture;
@@ -14,9 +15,6 @@ export class Component {
     this._repeatingDays = data.repeatingDays;
     this._isFavorite = data.isFavorite;
     this._isDone = data.isDone;
-
-    this._element = null;
-    this._state = {};
   }
 
   _renderControls() {
@@ -24,14 +22,14 @@ export class Component {
     <div class='card__control'>
       <button class='card__btn card__btn--edit'>edit</button>
       <button class='card__btn card__btn--archive'>archive</button>
-      <button class='card__btn card__btn--favorites ${this._isFavorite || `card__btn--disabled`}'>favorites</button>
+      <button class='card__btn card__btn--favorites ${this._isFavorite ? `` : `card__btn--disabled`}'>favorites</button>
     </div>`;
   }
 
   _renderColorBar() {
     return `
     <div class='card__color-bar'>
-      <svg width="100%" height="10">
+      <svg class="card__color-bar-wave" width="100%" height="10">
         <use xlink:href="#wave"></use>
       </svg>
     </div>`;
@@ -85,33 +83,11 @@ export class Component {
     </label>`;
   }
 
+  _hasDate() {
+    return this._dueDate !== ``;
+  }
+
   _isRepeated() {
     return Object.values(this._repeatingDays).some((it) => it);
   }
-
-  get element() {
-    return this._element;
-  }
-
-  get template() {
-    throw new Error(`You have to define template.`);
-  }
-
-  bind() {}
-
-  unbind() {}
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element.remove();
-    this._element = null;
-  }
-
-  update() {}
 }

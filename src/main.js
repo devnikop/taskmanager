@@ -1,13 +1,12 @@
-import {createFilter} from './make-filter';
-import {getRandomInt} from './util';
-import {removeAllElementsByClass} from './util';
-import {task} from './data';
+import {taskList as taskDataList} from './data';
 import Task from './task';
 import TaskEdit from './task-edit';
+import Filter from './filter';
+import {createStatistics} from './statistic';
+import {removeAll} from './util';
+import _ from '../node_modules/lodash';
+import moment from '../node_modules/moment';
 
-const TASK_COUNT = 7;
-const TASK_COUNT_MIN = 1;
-const TASK_COUNT_MAX = 7;
 
 const FilterName = new Set([
   `All`,
@@ -19,26 +18,20 @@ const FilterName = new Set([
   `Archive`,
 ]);
 
-const addRandomCountOfTask = (taskCount) => {
-  const fragment = document.createDocumentFragment();
-  for (let i = 0; i < taskCount; i++) {
-    fragment.appendChild(tasks[i]);
-  }
-  boardTasksContainerElement.appendChild(fragment);
+const clearTaskBoard = () => {
+  removeAll(document.querySelectorAll(`.board__tasks .card`));
 };
 
-const filterClickHandler = (evt) => {
-  if (evt.target.matches(`.filter__input`)) {
-    removeAllElementsByClass(document.querySelectorAll(`.board__tasks .card`));
-    addRandomCountOfTask(getRandomInt(TASK_COUNT_MIN, TASK_COUNT_MAX));
-  }
-};
-
-const createTasks = () => {
+const createTasks = (taskList) => {
   let tasks = [];
-  for (let i = 0; i < TASK_COUNT; i++) {
-    const taskComponent = new Task(task);
-    const editTaskComponent = new TaskEdit(task);
+  for (let i = 0; i < taskList.length; i++) {
+    if (taskList[i] === `deleted`) {
+      tasks[i] = `deleted`;
+      continue;
+    }
+    const task = taskList[i];
+    const taskComponent = new Task(_.cloneDeep(task));
+    const editTaskComponent = new TaskEdit(_.cloneDeep(task));
 
     taskComponent.onEdit = () => {
       editTaskComponent.render();
@@ -47,16 +40,18 @@ const createTasks = () => {
     };
 
     editTaskComponent.onSubmit = (newObject) => {
-      task.title = newObject.title;
-      task.tags = newObject.tags;
-      task.color = newObject.color;
-      task.repeatingDays = newObject.repeatingDays;
-      task.dueDate = newObject.dueDate;
+      const updatedTask = Object.assign(taskDataList[i], newObject);
 
-      taskComponent.update(task);
+      taskComponent.update(_.cloneDeep(updatedTask));
       taskComponent.render();
       boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
+    };
+
+    editTaskComponent.onDelete = () => {
+      clearTaskBoard();
+      taskList[i] = `deleted`;
+      appendTasks(createTasks(taskDataList));
     };
 
     tasks[i] = taskComponent.render();
@@ -64,23 +59,85 @@ const createTasks = () => {
   return tasks;
 };
 
+const getOverdueTasks = () => taskDataList.map((task) => moment().isAfter(moment(task.dueDate)) ? task : `deleted`);
+const getTodayTasks = () => taskDataList.map((task) => moment(task.dueDate).isSame(moment(), `day`) ? task : `deleted`);
+const getRepeatingTasks = () => taskDataList.map((task) => Object.values(task.repeatingDays).some((it) => it) ? task : `deleted`);
+
+const filterTasks = (filterName) => {
+  let filteredTasks = [];
+  switch (filterName) {
+    case `All`:
+      filteredTasks = createTasks(taskDataList);
+      break;
+    case `Overdue`:
+      filteredTasks = createTasks(getOverdueTasks());
+      break;
+    case `Today`:
+      filteredTasks = createTasks(getTodayTasks());
+      break;
+    case `Repeating`:
+      filteredTasks = createTasks(getRepeatingTasks());
+      break;
+    default:
+      break;
+  }
+  appendTasks(filteredTasks);
+};
+
 const createFilters = () => {
   let filters = [];
   for (let i = 0; i < FilterName.size; i++) {
-    filters[i] = createFilter([...FilterName][i]);
+    const filterComponent = new Filter([...FilterName][i]);
+
+    filterComponent.onFilter = (filterName) => {
+      clearTaskBoard();
+      filterTasks(filterName);
+    };
+
+    filters[i] = filterComponent.render();
   }
   return filters;
 };
 
+const appendTasks = (tasks) => {
+  for (const task of tasks) {
+    if (task !== `deleted`) {
+      boardTasksContainerElement.appendChild(task);
+    }
+  }
+};
+
+const appendFilters = (filters) => {
+  for (const filter of filters) {
+    filterContainerElement.appendChild(filter);
+  }
+};
+
 const boardTasksContainerElement = document.querySelector(`.board__tasks`);
-
-const tasks = createTasks();
-const filters = createFilters();
-
-for (const it of tasks) {
-  boardTasksContainerElement.appendChild(it);
-}
+const tasks = createTasks(taskDataList);
+appendTasks(tasks);
 
 const filterContainerElement = document.querySelector(`.main__filter`);
-filterContainerElement.addEventListener(`click`, filterClickHandler);
-filterContainerElement.insertAdjacentHTML(`beforeend`, filters.join(``));
+const filters = createFilters();
+appendFilters(filters);
+
+
+const onStatisticButtonClick = () => {
+  boardContainerElement.classList.add(`visually-hidden`);
+  statisticContainerElement.classList.remove(`visually-hidden`);
+};
+
+const onTaskButtonClick = () => {
+  statisticContainerElement.classList.add(`visually-hidden`);
+  boardContainerElement.classList.remove(`visually-hidden`);
+};
+
+const boardContainerElement = document.querySelector(`.board.container`);
+const statisticContainerElement = document.querySelector(`.statistic`);
+const statisticButtonElement = document.querySelector(`#control__statistic`);
+const taskButtonElement = document.querySelector(`#control__task`);
+
+statisticButtonElement.addEventListener(`click`, onStatisticButtonClick);
+taskButtonElement.addEventListener(`click`, onTaskButtonClick);
+
+createStatistics();

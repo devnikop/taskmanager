@@ -1,7 +1,7 @@
-import {Component} from './component';
+import {TaskComponent} from './task-component';
 import moment from '../node_modules/moment';
 
-export default class Task extends Component {
+export default class Task extends TaskComponent {
   constructor(data) {
     super(data);
 
@@ -12,7 +12,7 @@ export default class Task extends Component {
 
   get template() {
     return `
-    <article class='card card--${this._color} ${this._isRepeated() && `card--repeat`}'>
+    <article class='card card--${this._color} ${this._isRepeated() ? `card--repeat` : ``}'>
       <form class='card__form' method='get'>
         <div class='card__inner'>
           ${this._renderControls()}
@@ -27,7 +27,7 @@ export default class Task extends Component {
   _renderDetails() {
     return `
     <div class='card__details'>
-      <div class='card__dates'>${moment(this._dueDate).format(`D MMMM h:mm`)}</div>
+      <div class='card__dates'>${moment(this._dueDate).format(`D MMMM k:mm`)}</div>
       ${this._renderHashtag()}
     </div>`;
   }
