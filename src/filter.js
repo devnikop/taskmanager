@@ -20,7 +20,7 @@ export default class Filter extends BaseComponent {
         type='radio'
         id='filter__${this._name.toLowerCase()}'
         name='filter'
-        checked>
+        >
       <label class='filter__label' for='filter__${this._name.toLowerCase()}'> ${this._name}
         <span class="filter__${this._name.toLowerCase()}-count">(12)</span>
       </label>
@@ -31,8 +31,7 @@ export default class Filter extends BaseComponent {
     this._onFilter = fn;
   }
 
-  _onFilterClick(evt) {
-    evt.preventDefault();
+  _onFilterClick() {
     return typeof this._onFilter === `function` && this._onFilter(this._name);
   }
 

@@ -2,9 +2,11 @@ import {taskList as taskDataList} from './data';
 import Task from './task';
 import TaskEdit from './task-edit';
 import Filter from './filter';
+import {createStatistics} from './statistic';
 import {removeAll} from './util';
 import _ from '../node_modules/lodash';
 import moment from '../node_modules/moment';
+
 
 const FilterName = new Set([
   `All`,
@@ -118,3 +120,24 @@ appendTasks(tasks);
 const filterContainerElement = document.querySelector(`.main__filter`);
 const filters = createFilters();
 appendFilters(filters);
+
+
+const onStatisticButtonClick = () => {
+  boardContainerElement.classList.add(`visually-hidden`);
+  statisticContainerElement.classList.remove(`visually-hidden`);
+};
+
+const onTaskButtonClick = () => {
+  statisticContainerElement.classList.add(`visually-hidden`);
+  boardContainerElement.classList.remove(`visually-hidden`);
+};
+
+const boardContainerElement = document.querySelector(`.board.container`);
+const statisticContainerElement = document.querySelector(`.statistic`);
+const statisticButtonElement = document.querySelector(`#control__statistic`);
+const taskButtonElement = document.querySelector(`#control__task`);
+
+statisticButtonElement.addEventListener(`click`, onStatisticButtonClick);
+taskButtonElement.addEventListener(`click`, onTaskButtonClick);
+
+createStatistics();
