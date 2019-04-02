@@ -1,4 +1,3 @@
-import {taskList as taskDataList} from './data';
 import Chart from '../node_modules/chart.js';
 import ChartDataLabels from '../node_modules/chartjs-plugin-datalabels';
 import flatpickr from '../node_modules/flatpickr';
@@ -10,8 +9,10 @@ const statisticInputElement = statisticContainerElement.querySelector(`.statisti
 
 const tagsCtx = document.querySelector(`.statistic__tags`);
 const colorsCtx = document.querySelector(`.statistic__colors`);
+let taskDataList = [];
 
-export const createStatistics = (selectedDates) => {
+export const createStatistics = (serverTasks, selectedDates) => {
+  taskDataList = serverTasks;
   let dateStart = ``;
   let dateEnd = ``;
   if (typeof selectedDates === `undefined`) {
@@ -147,10 +148,9 @@ export const createStatistics = (selectedDates) => {
 };
 
 flatpickr(statisticInputElement, {
-  onClose: (selectedDates) => createStatistics(selectedDates),
+  onClose: (selectedDates) => createStatistics(taskDataList, selectedDates),
   mode: `range`,
   defaultDate: [moment().startOf(`week`).format(`D MMMM`), moment().endOf(`week`).format(`D MMMM`)],
-  minDate: `today`,
   altInput: true,
   altFormat: `j F`,
   dateFormat: `j F`

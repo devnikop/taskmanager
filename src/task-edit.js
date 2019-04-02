@@ -178,7 +178,7 @@ export default class TaskEdit extends TaskComponent {
 
   _onDeleteButtonClick(evt) {
     evt.preventDefault();
-    return typeof this._onDelete === `function` && this._onDelete();
+    return typeof this._onDelete === `function` && this._onDelete(this._id);
   }
 
   _onChangeDate() {

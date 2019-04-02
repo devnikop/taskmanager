@@ -7,6 +7,7 @@ export class TaskComponent extends BaseComponent {
     }
 
     super();
+    this._id = data.id;
     this._title = data.title;
     this._tags = data.tags;
     this._picture = data.picture;
