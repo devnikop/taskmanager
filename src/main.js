@@ -24,6 +24,27 @@ const clearTaskBoard = () => {
   removeAll(document.querySelectorAll(`.board__tasks .card`));
 };
 
+const blockForm = (editTaskComponent) => {
+  cardFormElement = editTaskComponent.element.querySelector(`.card__inner`);
+  cardFormElement.style.border = `1px solid black`;
+  cardFormElement.classList.remove(`shake`);
+  saveButtonElement = editTaskComponent.element.querySelector(`.card__save`);
+  deleteButtonElement = editTaskComponent.element.querySelector(`.card__delete`);
+  saveButtonElement.disabled = true;
+  deleteButtonElement.disabled = true;
+};
+
+const unblockForm = () => {
+  cardFormElement.classList.add(`shake`);
+  cardFormElement.style.border = `1px solid red`;
+  saveButtonElement.disabled = false;
+  deleteButtonElement.disabled = false;
+};
+
+let cardFormElement = ``;
+let saveButtonElement = ``;
+let deleteButtonElement = ``;
+
 const createTasks = (taskList) => {
   let tasks = [];
   for (let i = 0; i < taskList.length; i++) {
@@ -35,6 +56,7 @@ const createTasks = (taskList) => {
     const taskComponent = new Task(_.cloneDeep(task));
     const editTaskComponent = new TaskEdit(_.cloneDeep(task));
 
+
     taskComponent.onEdit = () => {
       editTaskComponent.render();
       boardTasksContainerElement.replaceChild(editTaskComponent.element, taskComponent.element);
@@ -43,16 +65,27 @@ const createTasks = (taskList) => {
 
     editTaskComponent.onSubmit = (newObject) => {
       const updatedTask = Object.assign(taskDataList[i], newObject);
+      blockForm(editTaskComponent);
+      saveButtonElement.textContent = `Saving...`;
+
+
       api.updateTask({id: updatedTask.id, data: updatedTask.toRAW()})
         .then((newTask) => {
           taskComponent.update(_.cloneDeep(newTask));
           taskComponent.render();
           boardTasksContainerElement.replaceChild(taskComponent.element, editTaskComponent.element);
           editTaskComponent.unrender();
+        })
+        .catch(() => {
+          unblockForm();
+          saveButtonElement.textContent = `Save`;
         });
     };
 
     editTaskComponent.onDelete = (id) => {
+      blockForm(editTaskComponent);
+      deleteButtonElement.textContent = `Deleting...`;
+
       api.deleteTask({id})
       // must try to refactor for deleting only 1 task from DOM
         .then(clearTaskBoard)
@@ -61,7 +94,10 @@ const createTasks = (taskList) => {
           taskDataList = serverTasks;
           appendTasks(createTasks(taskDataList));
         })
-        .catch(alert);
+        .catch(() => {
+          unblockForm();
+          deleteButtonElement.textContent = `Delete`;
+        });
     };
 
     tasks[i] = taskComponent.render();
@@ -140,7 +176,16 @@ const onTaskButtonClick = () => {
   boardContainerElement.classList.remove(`visually-hidden`);
 };
 
+const onError = () => {
+  noTasksElement.classList.remove(`visually-hidden`);
+  noTasksElement.textContent = `Something went wrong while loading your tasks. Check your connection or try again later`;
+};
+
 const boardTasksContainerElement = document.querySelector(`.board__tasks`);
+const noTasksElement = document.querySelector(`.board__no-tasks`);
+noTasksElement.textContent = `Loading tasks...`;
+noTasksElement.classList.remove(`visually-hidden`);
+
 let taskDataList = [];
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -152,8 +197,10 @@ api.getTasks()
   })
   .then((serverTasks) => {
     taskDataList = serverTasks;
+    noTasksElement.classList.add(`visually-hidden`);
     appendTasks(createTasks(taskDataList));
-  });
+  })
+  .catch((onError));
 
 const filterContainerElement = document.querySelector(`.main__filter`);
 const filters = createFilters();
