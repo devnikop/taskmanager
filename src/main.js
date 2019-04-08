@@ -7,10 +7,10 @@ import {createStatistics} from './statistic';
 import {removeAll} from './util';
 import _ from '../node_modules/lodash';
 import moment from '../node_modules/moment';
-import { Store } from './store';
+import {Store} from './store';
 
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
-const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo4`;
 
 const FilterName = new Set([
   `All`,
