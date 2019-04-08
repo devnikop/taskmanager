@@ -11,3 +11,9 @@ export const createElement = (template) => {
   newElement.insertAdjacentHTML(`beforeend`, template);
   return newElement.firstChild;
 };
+
+export const generateId = () => Math.random().toString(36).substr(2, 5);
+
+export const objectToArray = (object) => {
+  return Object.keys(object).map((id) => object[id]);
+};

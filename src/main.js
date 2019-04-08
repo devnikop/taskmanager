@@ -1,4 +1,5 @@
 import API from './api';
+import {Provider} from './provider';
 import Task from './task';
 import TaskEdit from './task-edit';
 import Filter from './filter';
@@ -6,6 +7,7 @@ import {createStatistics} from './statistic';
 import {removeAll} from './util';
 import _ from '../node_modules/lodash';
 import moment from '../node_modules/moment';
+import { Store } from './store';
 
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
@@ -69,7 +71,7 @@ const createTasks = (taskList) => {
       saveButtonElement.textContent = `Saving...`;
 
 
-      api.updateTask({id: updatedTask.id, data: updatedTask.toRAW()})
+      provider.updateTask({id: updatedTask.id, data: updatedTask.toRAW()})
         .then((newTask) => {
           taskComponent.update(_.cloneDeep(newTask));
           taskComponent.render();
@@ -86,10 +88,10 @@ const createTasks = (taskList) => {
       blockForm(editTaskComponent);
       deleteButtonElement.textContent = `Deleting...`;
 
-      api.deleteTask({id})
+      provider.deleteTask({id})
       // must try to refactor for deleting only 1 task from DOM
         .then(clearTaskBoard)
-        .then(() => api.getTasks())
+        .then(() => provider.getTasks())
         .then((serverTasks) => {
           taskDataList = serverTasks;
           appendTasks(createTasks(taskDataList));
@@ -176,7 +178,9 @@ const onTaskButtonClick = () => {
   boardContainerElement.classList.remove(`visually-hidden`);
 };
 
-const onError = () => {
+const onError = (error) => {
+  // eslint-disable-next-line no-console
+  console.error(error);
   noTasksElement.classList.remove(`visually-hidden`);
   noTasksElement.textContent = `Something went wrong while loading your tasks. Check your connection or try again later`;
 };
@@ -188,8 +192,22 @@ noTasksElement.classList.remove(`visually-hidden`);
 
 let taskDataList = [];
 
+const TASKS_STORE_KEY = `tasks-store-key`;
+
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-api.getTasks()
+const store = new Store({key: TASKS_STORE_KEY, storage: localStorage});
+const provider = new Provider({api, store});
+
+window.addEventListener(`offline`, () => {
+  document.title = `${document.title}[OFFLINE]`;
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.split(`[OFFLINE]`)[0];
+  provider.syncTasks();
+});
+
+provider.getTasks()
   .then((serverTasks) => {
     taskDataList = serverTasks;
     createStatistics(taskDataList);
