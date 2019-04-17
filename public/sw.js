@@ -9,7 +9,7 @@ self.addEventListener(`install`, (evt) => {
         return cache.addAll([
           `./`,
           `./index.html`,
-          `./main.js`,
+          `./bundle.js`,
           `./css/normalize.css`,
           `./css/style.css`,
           `./fonts/HelveticaNeueCyr-Bold.woff`,
