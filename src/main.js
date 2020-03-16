@@ -13,6 +13,12 @@
     return fragment;
   };
 
+  const removeChildren = parentNode => {
+    while (parentNode.firstChild) {
+      parentNode.lastChild.remove();
+    }
+  };
+
   // util END
 
   // filter START
@@ -72,6 +78,18 @@
     const filterNodes = getFilterNodeList();
     mainFilterElement.appendChild(filterNodes);
   };
+
+  const onMainFilterClick = evt => {
+    if (evt.target.classList.contains(`filter__input`)) {
+      // boardTasksElement - module task
+      removeChildren(boardTasksElement);
+
+      // addTasks - module task
+      addTasks(getRandomNumber(5));
+    }
+  };
+
+  mainFilterElement.addEventListener(`click`, onMainFilterClick);
 
   addFilters();
 
@@ -380,18 +398,18 @@
     return taskNode;
   };
 
-  const getTaskNodeList = () => {
+  const getTaskNodeList = taskCount => {
     const fragment = document.createDocumentFragment();
-    [...Array(TASK_COUNT)].forEach(() => fragment.appendChild(getTaskNode()));
+    [...Array(taskCount)].forEach(() => fragment.appendChild(getTaskNode()));
     return fragment;
   };
 
-  const addTasks = () => {
-    const taskNodes = getTaskNodeList();
+  const addTasks = taskCount => {
+    const taskNodes = getTaskNodeList(taskCount);
     boardTasksElement.appendChild(taskNodes);
   };
 
-  addTasks();
+  addTasks(TASK_COUNT);
 
   // task END
 })();
