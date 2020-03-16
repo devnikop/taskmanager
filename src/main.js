@@ -5,8 +5,17 @@
 
   const getRandomNumber = max => Math.ceil(Math.random() * max);
 
+  const getNode = htmlString => {
+    const element = document.createElement(`div`);
+    element.insertAdjacentHTML(`beforeend`, htmlString);
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(element);
+    return fragment;
+  };
+
   // util END
 
+  // filter START
   const getElement = {
     Selector: {
       MAIN_FILTER: `.main__filter`
@@ -27,14 +36,6 @@
     `archive`
   ];
 
-  const getNode = htmlString => {
-    const element = document.createElement(`div`);
-    element.insertAdjacentHTML(`beforeend`, htmlString);
-    const fragment = document.createDocumentFragment();
-    fragment.appendChild(element);
-    return fragment;
-  };
-
   const getFilterHtml = (text, count) => `
     <input
       type="radio"
@@ -48,18 +49,34 @@
     >
   `;
 
-  const addFilters = () => {
-    const mainFilter = getElement.mainFilter;
+  const getFilterNode = (filter) => {
+    const filterHmtl = getFilterHtml(filter, getRandomNumber(20));
+    const filterNode = getNode(filterHmtl);
+    return filterNode;
+  };
 
+  const getFilterNodeList = () => {
     const fragment = document.createDocumentFragment();
     filterSet.forEach(filter => {
-      const filterHmtl = getFilterHtml(filter, getRandomNumber(20));
-      const filterNode = getNode(filterHmtl);
-      fragment.appendChild(filterNode);
+      fragment.appendChild(getFilterNode(filter));
     });
+    return fragment;
+  };
 
-    mainFilter.appendChild(fragment);
+  const addFilters = () => {
+    const mainFilter = getElement.mainFilter;
+    const filterNodes = getFilterNodeList();
+
+    mainFilter.appendChild(filterNodes);
   };
 
   addFilters();
+
+  // filter END
+
+  // task START
+
+  
+
+  // task END
 })();
