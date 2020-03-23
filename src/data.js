@@ -49,7 +49,8 @@ const mockData = {
   }
 };
 
-const getTaskData = () => ({
+const getTaskData = index => ({
+  id: index,
   title: mockData.title,
   dueDate: mockData.date,
   tags: mockData.tag,
@@ -60,6 +61,8 @@ const getTaskData = () => ({
   isDone: false
 });
 
-const taskList = Array.from({ length: 20 }, () => getTaskData());
+const taskList = Array.from({ length: 20 }, (item, index) =>
+  getTaskData(index)
+);
 
 export { taskList };

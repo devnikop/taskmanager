@@ -1,6 +1,7 @@
 const COLORS = new Set([`black`, `yellow`, `blue`, `green`, `pink`]);
 
 const renderTaskHtml = ({
+  id,
   title,
   dueDate,
   tags,
@@ -88,12 +89,12 @@ const renderTaskHtml = ({
                         <input
                           class="visually-hidden card__repeat-day-input"
                           type="checkbox"
-                          id="repeat-${day}-5"
+                          id="repeat-${day}-${id}"
                           name="repeat"
                           value="${day}"
                           ${repeatingDays[day] ? `checked` : ``}
                         />
-                        <label class="card__repeat-day" for="repeat-${day}-5"
+                        <label class="card__repeat-day" for="repeat${id}-${day}-5"
                           >${day}</label
                         >
                       `
@@ -157,14 +158,14 @@ const renderTaskHtml = ({
                     colorName => `
                       <input
                         type="radio"
-                        id="color-${colorName}-5"
+                        id="color-${colorName}-${id}"
                         class="card__color-input card__color-input--${colorName} visually-hidden"
                         name="color"
                         value="${colorName}"
                         ${color === colorName ? `checked` : ``}
                       />
                       <label
-                        for="color-${colorName}-5"
+                        for="color-${colorName}-${id}"
                         class="card__color card__color--${colorName}"
                         >${colorName}</label
                       >
