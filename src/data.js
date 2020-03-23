@@ -38,13 +38,13 @@ const mockData = {
 
   get repeatingDays() {
     return {
-      Mo: true,
-      Tu: false,
-      We: true,
-      Th: true,
-      Fr: false,
-      Sa: false,
-      Su: false
+      Mo: Math.random() > 0.1 ? true : false,
+      Tu: Math.random() > 0.5 ? true : false,
+      We: Math.random() > 0.5 ? true : false,
+      Th: Math.random() > 0.5 ? true : false,
+      Fr: Math.random() > 0.5 ? true : false,
+      Sa: Math.random() > 0.5 ? true : false,
+      Su: Math.random() > 0.5 ? true : false
     };
   }
 };
