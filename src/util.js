@@ -1,5 +1,8 @@
 const getRandomNumber = max => Math.ceil(Math.random() * max);
 
+const getRandomArrayItem = array =>
+  array[Math.floor(Math.random() * array.length)];
+
 const getNode = htmlString => {
   const element = document.createElement(`div`);
   element.insertAdjacentHTML(`beforeend`, htmlString);
@@ -14,4 +17,4 @@ const removeChildren = parentNode => {
   }
 };
 
-export { getRandomNumber, getNode, removeChildren };
+export { getRandomNumber, getRandomArrayItem, getNode, removeChildren };
