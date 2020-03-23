@@ -1,28 +1,31 @@
+import { taskList } from "./data";
 import { getNode } from "./util";
 import { boardTasksElement } from "./filter";
-import { getTaskHtml } from "./task-html";
+import { renderTaskHtml } from "./render-task";
 
 const TASK_COUNT = 7;
 
-const getTaskNode = () => {
-  const taskHtml = getTaskHtml();
+const getTaskNode = task => {
+  const taskHtml = renderTaskHtml(task);
   const taskNode = getNode(taskHtml);
   return taskNode;
 };
 
-const getTaskNodeList = taskCount => {
+const getTaskNodeList = () => {
   const fragment = document.createDocumentFragment();
-  [...Array(taskCount)].forEach(() => fragment.appendChild(getTaskNode()));
+  [...taskList]
+    .slice(0, TASK_COUNT)
+    .forEach(task => fragment.appendChild(getTaskNode(task)));
   return fragment;
 };
 
-const addTasks = taskCount => {
-  const taskNodes = getTaskNodeList(taskCount);
+const addTasks = () => {
+  const taskNodes = getTaskNodeList();
   boardTasksElement.appendChild(taskNodes);
 };
 
 const initTasks = () => {
-  addTasks(TASK_COUNT);
+  addTasks();
 };
 
 export { addTasks, initTasks };

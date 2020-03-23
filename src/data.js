@@ -49,7 +49,7 @@ const mockData = {
   }
 };
 
-const task = {
+const getTaskData = () => ({
   title: mockData.title,
   dueDate: mockData.date,
   tags: mockData.tag,
@@ -58,8 +58,8 @@ const task = {
   repeatingDays: mockData.repeatingDays,
   isFavorite: true,
   isDone: false
-};
+});
 
-const taskList = Array.from({ length: 20 }, () => task);
+const taskList = Array.from({ length: 20 }, () => getTaskData());
 
 export { taskList };
