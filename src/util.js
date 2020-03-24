@@ -11,10 +11,22 @@ const getNode = htmlString => {
   return fragment;
 };
 
+const createElement = template => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstElementChild;
+};
+
 const removeChildren = parentNode => {
   while (parentNode.firstChild) {
     parentNode.lastChild.remove();
   }
 };
 
-export { getRandomNumber, getRandomArrayItem, getNode, removeChildren };
+export {
+  createElement,
+  getNode,
+  getRandomArrayItem,
+  getRandomNumber,
+  removeChildren
+};

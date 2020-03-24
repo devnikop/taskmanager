@@ -1,3 +1,3 @@
-import { initTasks } from "./task";
+import { initTasks } from "./taskold";
 
 initTasks();
