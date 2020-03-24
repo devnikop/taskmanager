@@ -1,6 +1,7 @@
 import { taskList } from "./data";
 import { boardTasksElement } from "./filter";
 import { Task } from "./task";
+import { TaskEdit } from "./task-edit";
 
 const TASK_COUNT = 7;
 
