@@ -15,6 +15,19 @@ export class TaskEdit {
     this._isDone = props.isDone;
 
     this._element = null;
+    this._onSubmit = null;
+  }
+
+  _onTaskSumbit() {
+    typeof this._onSubmit === `function` && this._onSubmit();
+  }
+
+  get element() {
+    return this._element;
+  }
+
+  set onSubmit(cb) {
+    this._onSubmit = cb;
   }
 
   get template() {
@@ -22,7 +35,7 @@ export class TaskEdit {
       <article class="card card--edit card--${this._color} ${
       Object.values(this._repeatingDays).includes(true) ? `card--repeat` : ``
     }">
-        <form class="card__form" method="get">
+        <form class="card__form">
           <div class="card__inner">
             <div class="card__control">
               <button type="button" class="card__btn card__btn--edit">
@@ -196,22 +209,24 @@ export class TaskEdit {
     `;
   }
 
+  _bind() {
+    this._element
+      .querySelector(`.card__form`)
+      .addEventListener(`submit`, this._onTaskSumbit.bind(this));
+  }
+
   render() {
     this._element = createElement(this.template);
     this._bind();
     return this._element;
   }
 
+  _unbind() {
+    // remove event listeners
+  }
+
   unrender() {
     this._unbind();
     this._element = null;
-  }
-
-  _bind() {
-    // add event listeners
-  }
-
-  _unbind() {
-    // remove event listeners
   }
 }

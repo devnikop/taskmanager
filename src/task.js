@@ -15,6 +15,19 @@ export class Task {
     this._isDone = props.isDone;
 
     this._element = null;
+    this._onEdit = null;
+  }
+
+  _onEditButtonClick() {
+    typeof this._onEdit === `function` && this._onEdit();
+  }
+
+  get element() {
+    return this._element;
+  }
+
+  set onEdit(cb) {
+    this._onEdit = cb;
   }
 
   get template() {
@@ -147,7 +160,9 @@ export class Task {
                 </div>
               </div>
 
-              <label class="card__img-wrap card__img-wrap--empty">
+              <label class="card__img-wrap ${
+                this._picture ? `` : `card__img-wrap--empty`
+              }">
                 <input
                   type="file"
                   class="card__img-input visually-hidden"
@@ -196,22 +211,24 @@ export class Task {
     `;
   }
 
+  _bind() {
+    this._element
+      .querySelector(`.card__btn--edit`)
+      .addEventListener(`click`, this._onEditButtonClick.bind(this));
+  }
+
   render() {
     this._element = createElement(this.template);
     this._bind();
     return this._element;
   }
 
+  _unbind() {
+    // remove event listeners
+  }
+
   unrender() {
     this._unbind();
     this._element = null;
-  }
-
-  _bind() {
-    // add event listeners
-  }
-
-  _unbind() {
-    // remove event listeners
   }
 }
