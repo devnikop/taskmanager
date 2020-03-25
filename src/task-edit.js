@@ -1,9 +1,11 @@
-import { createElement } from "./util";
+import { Component } from "./component";
 
 const COLORS = new Set([`black`, `yellow`, `blue`, `green`, `pink`]);
 
-export class TaskEdit {
+export class TaskEdit extends Component {
   constructor(props) {
+    super();
+
     this._id = props.id;
     this._title = props.title;
     this._dueDate = props.dueDate;
@@ -14,16 +16,11 @@ export class TaskEdit {
     this._isFavorite = props.isFavorite;
     this._isDone = props.isDone;
 
-    this._element = null;
     this._onSubmit = null;
   }
 
   _onTaskSumbit() {
     typeof this._onSubmit === `function` && this._onSubmit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onSubmit(cb) {
@@ -215,18 +212,9 @@ export class TaskEdit {
       .addEventListener(`submit`, this._onTaskSumbit.bind(this));
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this._bind();
-    return this._element;
-  }
-
   _unbind() {
-    // remove event listeners
-  }
-
-  unrender() {
-    this._unbind();
-    this._element = null;
+    this._element
+      .querySelector(`.card__form`)
+      .removeEventListener(`submit`, this._onTaskSumbit.bind(this));
   }
 }

@@ -1,9 +1,11 @@
-import { createElement } from "./util";
+import { Component } from "./component";
 
 const COLORS = new Set([`black`, `yellow`, `blue`, `green`, `pink`]);
 
-export class Task {
+export class Task extends Component {
   constructor(props) {
+    super();
+
     this._id = props.id;
     this._title = props.title;
     this._dueDate = props.dueDate;
@@ -14,16 +16,11 @@ export class Task {
     this._isFavorite = props.isFavorite;
     this._isDone = props.isDone;
 
-    this._element = null;
     this._onEdit = null;
   }
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(cb) {
@@ -217,18 +214,9 @@ export class Task {
       .addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this._bind();
-    return this._element;
-  }
-
   _unbind() {
-    // remove event listeners
-  }
-
-  unrender() {
-    this._unbind();
-    this._element = null;
+    this._element
+      .querySelector(`.card__btn--edit`)
+      .removeEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 }
