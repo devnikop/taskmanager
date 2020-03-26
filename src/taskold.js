@@ -19,11 +19,7 @@ const getTaskElement = taskData => {
   };
 
   taskEditComponent.onFormSubmitCb = newData => {
-    taskData.color = newData.color;
-    taskData.dueDate = newData.dueDate;
-    taskData.repeatingDays = newData.repeatingDays;
-    taskData.tags = newData.tags;
-    taskData.title = newData.title;
+    taskData = { ...taskData, ...newData };
 
     taskComponent.update(taskData);
     taskComponent.render();

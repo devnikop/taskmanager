@@ -1,3 +1,5 @@
+import flatpickr from "flatpickr";
+
 import { Component } from "./component";
 
 const COLORS_MAP = new Map([
@@ -11,7 +13,9 @@ const COLORS_MAP = new Map([
 const Selector = {
   CARD_DATE_DEADLINE_TOGGLE: `.card__date-deadline-toggle`,
   CARD_FORM: `.card__form`,
-  CARD_REPEAT_TOGGLE: `.card__repeat-toggle`
+  CARD_REPEAT_TOGGLE: `.card__repeat-toggle`,
+  CARD_DATE: `.card__date`,
+  CARD_TIME: `.card__time`
 };
 
 export class TaskEdit extends Component {
@@ -85,10 +89,13 @@ export class TaskEdit extends Component {
               <div class="card__details">
                 <div class="card__dates">
                   <button class="card__date-deadline-toggle" type="button">
-                    date: <span class="card__date-status">no</span>
+                    date: <span class="card__date-status">${
+                      this._state.isDate ? `yes` : `no`
+                    }</span>
                   </button>
 
-                  <fieldset class="card__date-deadline" disabled>
+                  <fieldset class="card__date-deadline" ${!this._state.isDate &&
+                    `disabled`}>
                     <label class="card__input-deadline-wrap">
                       <input
                         class="card__date"
@@ -110,7 +117,7 @@ export class TaskEdit extends Component {
 
                   <button class="card__repeat-toggle" type="button">
                     repeat:<span class="card__repeat-status">${
-                      this._state.isRepeated ? `YES` : `NO`
+                      this._state.isRepeated ? `yes` : `no`
                     }</span>
                   </button>
 
@@ -284,6 +291,21 @@ export class TaskEdit extends Component {
     this.element
       .querySelector(Selector.CARD_REPEAT_TOGGLE)
       .addEventListener(`click`, this._onRepeatToggleClick);
+
+    if (this._state.isDate) {
+      flatpickr(".card__date", {
+        altInput: true,
+        altFormat: "j F",
+        dateFormat: "j F"
+      });
+      flatpickr(".card__time", {
+        enableTime: true,
+        noCalendar: true,
+        altInput: true,
+        altFormat: "h:i K",
+        dateFormat: "h:i K"
+      });
+    }
   }
 
   _unbind() {
