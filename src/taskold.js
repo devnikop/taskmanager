@@ -18,7 +18,14 @@ const getTaskElement = taskData => {
     taskComponent.unrender();
   };
 
-  taskEditComponent.onFormSubmitCb = () => {
+  taskEditComponent.onFormSubmitCb = newData => {
+    taskData.color = newData.color;
+    taskData.dueDate = newData.dueDate;
+    taskData.repeatingDays = newData.repeatingDays;
+    taskData.tags = newData.tags;
+    taskData.title = newData.title;
+
+    taskComponent.update(taskData);
     taskComponent.render();
     boardTasksElement.replaceChild(
       taskComponent.element,

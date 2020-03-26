@@ -46,7 +46,7 @@ export class TaskEdit extends Component {
     return `
       <article class="card card--edit ${this._getColor()} ${this._isRepeated() &&
       `card--repeat`}">
-        <form class="card__form">
+        <form class="card__form" method="get">
           <div class="card__inner">
             <div class="card__control">
               <button type="button" class="card__btn card__btn--edit">
@@ -109,28 +109,32 @@ export class TaskEdit extends Component {
                   </fieldset>
 
                   <button class="card__repeat-toggle" type="button">
-                    repeat:<span class="card__repeat-status">no</span>
+                    repeat:<span class="card__repeat-status">${
+                      this._state.isRepeated ? `YES` : `NO`
+                    }</span>
                   </button>
 
-                  <fieldset class="card__repeat-days" disabled>
+                  <fieldset class="card__repeat-days" ${!this._state
+                    .isRepeated && `disabled`}>
                     <div class="card__repeat-days-inner">
-                      ${Object.keys(this._repeatingDays).map(
-                        day => `
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-${day}-${this._id}"
-                            name="repeat"
-                            value="${day}"
-                            ${this._repeatingDays[day] && `checked`}
-                          />
-                          <label class="card__repeat-day" for="repeat${
-                            this._id
-                          }-${day}-5"
-                            >${day}</label
-                          >
-                        `
-                      )}
+                      ${Object.keys(this._repeatingDays)
+                        .map(
+                          day => `
+                            <input
+                              class="visually-hidden card__repeat-day-input"
+                              type="checkbox"
+                              id="repeat-${day}-${this._id}"
+                              name="repeat"
+                              value="${day}"
+                              ${this._repeatingDays[day] && `checked`}
+                            />
+                            <label
+                              class="card__repeat-day"
+                              for="repeat-${day}-${this._id}"
+                            >${day}</label>
+                          `
+                        )
+                        .join(``)}
                     </div>
                   </fieldset>
                 </div>
@@ -238,6 +242,38 @@ export class TaskEdit extends Component {
     return COLORS_MAP.get(this._color);
   }
 
+  _partialUpdate() {
+    this._unbind();
+    this.element.innerHTML = this.template;
+    this._bind();
+  }
+
+  _processForm(formData) {
+    const entry = {
+      color: ``,
+      dueDate: new Date(),
+      repeatingDays: {
+        Mo: false,
+        Tu: false,
+        We: false,
+        Th: false,
+        Fr: false,
+        Sa: false,
+        Su: false
+      },
+      tags: new Set(),
+      title: ``
+    };
+
+    const taskEditMapper = TaskEdit.createMapper(entry);
+    for (const pair of formData.entries()) {
+      const [prop, value] = pair;
+      taskEditMapper[prop] && taskEditMapper[prop](value);
+    }
+
+    return entry;
+  }
+
   _bind() {
     this.element
       .querySelector(Selector.CARD_DATE_DEADLINE_TOGGLE)
@@ -264,23 +300,45 @@ export class TaskEdit extends Component {
 
   update(data) {
     this._color = data.color;
-    this._dueDate = props.dueDate;
+    this._dueDate = data.dueDate;
     this._repeatingDays = data.repeatingDays;
     this._tags = data.tags;
     this._title = data.title;
   }
 
   _onDateClick() {
+    this._state.isDate = !this._state.isDate;
+    this._partialUpdate();
+
     typeof this._onDateClickCb === `function` && this._onDateClickCb();
   }
 
   _onFormSumbit(evt) {
-    typeof this._onFormSubmitCb === `function` && this._onFormSubmitCb();
     evt.preventDefault();
+    const formData = new FormData(
+      this.element.querySelector(Selector.CARD_FORM)
+    );
+    const newData = this._processForm(formData);
+    typeof this._onFormSubmitCb === `function` && this._onFormSubmitCb(newData);
+
+    this.update(newData);
   }
 
   _onRepeatToggleClick() {
+    this._state.isRepeated = !this._state.isRepeated;
+    this._partialUpdate();
+
     typeof this._onRepeatToggleClickCb === `function` &&
       this._onRepeatToggleClickCb;
+  }
+
+  static createMapper(target) {
+    return {
+      color: value => (target.color = value),
+      date: value => (target.dueDate = value),
+      repeat: value => (target.repeatingDays[value] = true),
+      hashtag: value => target.tags.add(value),
+      text: value => (target.title = value)
+    };
   }
 }
