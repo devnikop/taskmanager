@@ -18,7 +18,7 @@ const getTaskElement = taskData => {
     taskComponent.unrender();
   };
 
-  taskEditComponent.onSubmit = () => {
+  taskEditComponent.onFormSubmitCb = () => {
     taskComponent.render();
     boardTasksElement.replaceChild(
       taskComponent.element,

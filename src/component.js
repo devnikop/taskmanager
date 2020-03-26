@@ -17,9 +17,9 @@ export class Component {
     throw new Error(`You have to define template.`);
   }
 
-  bind() {}
+  _bind() {}
 
-  unbind() {}
+  _unbind() {}
 
   render() {
     this._element = createElement(this.template);
@@ -31,4 +31,6 @@ export class Component {
     this._unbind();
     this._element = null;
   }
+
+  update() {}
 }

@@ -1,53 +1,65 @@
 import { Component } from "./component";
 
-const COLORS = new Set([`black`, `yellow`, `blue`, `green`, `pink`]);
+const COLORS_MAP = new Map([
+  [`black`, `card--black`],
+  [`yellow`, `card--yellow`],
+  [`blue`, `card--blue`],
+  [`green`, `card--green`],
+  [`pink`, `card--pink`]
+]);
+
+const Selector = {
+  CARD_DATE_DEADLINE_TOGGLE: `.card__date-deadline-toggle`,
+  CARD_FORM: `.card__form`,
+  CARD_REPEAT_TOGGLE: `.card__repeat-toggle`
+};
 
 export class TaskEdit extends Component {
   constructor(props) {
     super();
 
     this._id = props.id;
-    this._title = props.title;
-    this._dueDate = props.dueDate;
-    this._tags = props.tags;
-    this._picture = props.picture;
     this._color = props.color;
-    this._repeatingDays = props.repeatingDays;
-    this._isFavorite = props.isFavorite;
+    this._dueDate = props.dueDate;
     this._isDone = props.isDone;
+    this._isFavorite = props.isFavorite;
+    this._picture = props.picture;
+    this._repeatingDays = props.repeatingDays;
+    this._tags = props.tags;
+    this._title = props.title;
 
-    this._onSubmit = null;
-  }
+    this._state = {
+      isDate: false,
+      isRepeated: false
+    };
 
-  _onTaskSumbit() {
-    typeof this._onSubmit === `function` && this._onSubmit();
-  }
+    this._onDateClickCb = null;
+    this._onFormSubmitCb = null;
+    this._onRepeatToggleClickCb = null;
 
-  set onSubmit(cb) {
-    this._onSubmit = cb;
+    this._onDateClick = this._onDateClick.bind(this);
+    this._onFormSumbit = this._onFormSumbit.bind(this);
+    this._onRepeatToggleClick = this._onRepeatToggleClick.bind(this);
   }
 
   get template() {
     return `
-      <article class="card card--edit card--${this._color} ${
-      Object.values(this._repeatingDays).includes(true) ? `card--repeat` : ``
-    }">
+      <article class="card card--edit ${this._getColor()} ${this._isRepeated() &&
+      `card--repeat`}">
         <form class="card__form">
           <div class="card__inner">
             <div class="card__control">
               <button type="button" class="card__btn card__btn--edit">
                 edit
               </button>
-              <button type="button" class="card__btn card__btn--archive ${
-                this._isDone ? `` : `card__btn--disabled`
-              }">
+              <button type="button" class="card__btn card__btn--archive ${!this
+                ._isDone && `card__btn--disabled`}">
                 archive
               </button>
               <button
                 type="button"
-                class="card__btn card__btn--favorites ${
-                  this._isFavorite ? `` : `card__btn--disabled`
-                }"
+                class="card__btn card__btn--favorites ${!this._isFavorite &&
+                  `card__btn--disabled`}"
               >
                 favorites
               </button>
@@ -110,7 +122,7 @@ export class TaskEdit extends Component {
                             id="repeat-${day}-${this._id}"
                             name="repeat"
                             value="${day}"
-                            ${this._repeatingDays[day] ? `checked` : ``}
+                            ${this._repeatingDays[day] && `checked`}
                           />
                           <label class="card__repeat-day" for="repeat${
                             this._id
@@ -173,7 +185,7 @@ export class TaskEdit extends Component {
               <div class="card__colors-inner">
                 <h3 class="card__colors-title">Color</h3>
                 <div class="card__colors-wrap">
-                  ${[...COLORS]
+                  ${[...COLORS_MAP.keys()]
                     .map(
                       colorName => `
                         <input
@@ -182,7 +194,7 @@ export class TaskEdit extends Component {
                           class="card__color-input card__color-input--${colorName} visually-hidden"
                           name="color"
                           value="${colorName}"
-                          ${this._color === colorName ? `checked` : ``}
+                          ${this._color === colorName && `checked`}
                         />
                         <label
                           for="color-${colorName}-${this._id}"
@@ -206,15 +218,69 @@ export class TaskEdit extends Component {
     `;
   }
 
+  set onDateClickCb(cb) {
+    this._onDateClickCb = cb;
+  }
+
+  set onFormSubmitCb(cb) {
+    this._onFormSubmitCb = cb;
+  }
+
+  set onRepeatToggleClickCb(cb) {
+    this._onRepeatToggleClickCb = cb;
+  }
+
+  _isRepeated() {
+    return Object.values(this._repeatingDays).includes(true);
+  }
+
+  _getColor() {
+    return COLORS_MAP.get(this._color);
+  }
+
   _bind() {
-    this._element
-      .querySelector(`.card__form`)
-      .addEventListener(`submit`, this._onTaskSumbit.bind(this));
+    this.element
+      .querySelector(Selector.CARD_DATE_DEADLINE_TOGGLE)
+      .addEventListener(`click`, this._onDateClick);
+    this.element
+      .querySelector(Selector.CARD_FORM)
+      .addEventListener(`submit`, this._onFormSumbit);
+    this.element
+      .querySelector(Selector.CARD_REPEAT_TOGGLE)
+      .addEventListener(`click`, this._onRepeatToggleClick);
   }
 
   _unbind() {
-    this._element
-      .querySelector(`.card__form`)
-      .removeEventListener(`submit`, this._onTaskSumbit.bind(this));
+    this.element
+      .querySelector(Selector.CARD_DATE_DEADLINE_TOGGLE)
+      .removeEventListener(`click`, this._onDateClick);
+    this.element
+      .querySelector(Selector.CARD_FORM)
+      .removeEventListener(`submit`, this._onFormSumbit);
+    this.element
+      .querySelector(Selector.CARD_REPEAT_TOGGLE)
+      .removeEventListener(`click`, this._onRepeatToggleClick);
+  }
+
+  update(data) {
+    this._color = data.color;
+    this._dueDate = props.dueDate;
+    this._repeatingDays = data.repeatingDays;
+    this._tags = data.tags;
+    this._title = data.title;
+  }
+
+  _onDateClick() {
+    typeof this._onDateClickCb === `function` && this._onDateClickCb();
+  }
+
+  _onFormSumbit(evt) {
+    typeof this._onFormSubmitCb === `function` && this._onFormSubmitCb();
+    evt.preventDefault();
+  }
+
+  _onRepeatToggleClick() {
+    typeof this._onRepeatToggleClickCb === `function` &&
+      this._onRepeatToggleClickCb;
   }
 }
