@@ -300,6 +300,8 @@ export class TaskEdit extends TaskComponent {
   update(data) {
     this._color = data.color;
     this._dueDate = data.dueDate;
+    this._isDone = data.isDone;
+    this._isFavorite = data.isFavorite;
     this._repeatingDays = data.repeatingDays;
     this._tags = data.tags;
     this._title = data.title;

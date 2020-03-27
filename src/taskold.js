@@ -9,13 +9,24 @@ const getTaskElement = taskData => {
   const taskComponent = new Task(taskData);
   const taskEditComponent = new TaskEdit(taskData);
 
-  taskComponent.onEdit = () => {
+  taskComponent.onEditClickCb = () => {
     taskEditComponent.render();
     boardTasksElement.replaceChild(
       taskEditComponent.element,
       taskComponent.element
     );
     taskComponent.unrender();
+  };
+
+  taskComponent.onArchiveClickCb = newData => {
+    taskData = { ...taskData, ...newData };
+
+    const oldTaskElement = taskComponent.element;
+    taskComponent.update(taskData);
+    taskComponent.render();
+    boardTasksElement.replaceChild(taskComponent.element, oldTaskElement);
+
+    taskEditComponent.update(taskData);
   };
 
   taskEditComponent.onFormSubmitCb = newData => {

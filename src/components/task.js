@@ -1,10 +1,25 @@
 import { TaskComponent } from "./task-component";
 
+const Selector = {
+  CARD_ARCHIVE: `.card__btn--archive`,
+  CARD_EDIT: `.card__btn--edit`
+};
+
 export class Task extends TaskComponent {
   constructor(props) {
     super(props);
 
-    this._onEdit = null;
+    // dom elements
+    this._$cardArchive = null;
+    this._$cardEdit = null;
+
+    // outer callback
+    this._onArchiveClickCb = null;
+    this._onEditClickCb = null;
+
+    // inner event handlers
+    this._onArchiveClick = this._onArchiveClick.bind(this);
+    this._onEditClick = this._onEditClick.bind(this);
   }
 
   get template() {
@@ -79,30 +94,49 @@ export class Task extends TaskComponent {
     `;
   }
 
-  set onEdit(cb) {
-    this._onEdit = cb;
+  set onArchiveClickCb(cb) {
+    this._onArchiveClickCb = cb;
+  }
+
+  set onEditClickCb(cb) {
+    this._onEditClickCb = cb;
+  }
+
+  _initDomElements() {
+    this._$cardArchive = this.element.querySelector(Selector.CARD_ARCHIVE);
+    this._$cardEdit = this._element.querySelector(Selector.CARD_EDIT);
   }
 
   _bind() {
-    this._element
-      .querySelector(`.card__btn--edit`)
-      .addEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._initDomElements();
+
+    this._$cardArchive.addEventListener(`click`, this._onArchiveClick);
+    this._$cardEdit.addEventListener(`click`, this._onEditClick);
   }
 
   _unbind() {
-    this._element
-      .querySelector(`.card__btn--edit`)
-      .removeEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._$cardArchive.removeEventListener(`click`, this._onArchiveClick);
+    this._$cardEdit.removeEventListener(`click`, this._onEditClick);
   }
 
   update(data) {
-    this._title = data.title;
-    this._tags = data.tags;
     this._color = data.color;
+
     this._repeatingDays = data.repeatingDays;
+    this._tags = data.tags;
+    this._title = data.title;
   }
 
-  _onEditButtonClick() {
-    typeof this._onEdit === `function` && this._onEdit();
+  _onArchiveClick() {
+    this._isDone = !this._isDone;
+
+    typeof this._onArchiveClickCb === `function` &&
+      this._onArchiveClickCb({
+        isDone: this._isDone
+      });
+  }
+
+  _onEditClick() {
+    typeof this._onEditClickCb === `function` && this._onEditClickCb();
   }
 }

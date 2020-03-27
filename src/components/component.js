@@ -33,4 +33,8 @@ export class Component {
   }
 
   update() {}
+
+  static isFunction(func) {
+    return typeof func === `function`;
+  }
 }
