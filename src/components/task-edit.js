@@ -1,14 +1,6 @@
 import flatpickr from "flatpickr";
 
-import { Component } from "./component";
-
-const COLORS_MAP = new Map([
-  [`black`, `card--black`],
-  [`yellow`, `card--yellow`],
-  [`blue`, `card--blue`],
-  [`green`, `card--green`],
-  [`pink`, `card--pink`]
-]);
+import { TaskComponent } from "./task-component";
 
 const Selector = {
   CARD_DATE_DEADLINE_TOGGLE: `.card__date-deadline-toggle`,
@@ -18,19 +10,12 @@ const Selector = {
   CARD_TIME: `.card__time`
 };
 
-export class TaskEdit extends Component {
+export class TaskEdit extends TaskComponent {
   constructor(props) {
-    super();
+    super(props);
 
-    this._id = props.id;
-    this._color = props.color;
     this._dueDate = props.dueDate;
-    this._isDone = props.isDone;
-    this._isFavorite = props.isFavorite;
     this._picture = props.picture;
-    this._repeatingDays = props.repeatingDays;
-    this._tags = props.tags;
-    this._title = props.title;
 
     this._state = {
       isDate: false,
@@ -196,7 +181,7 @@ export class TaskEdit extends Component {
               <div class="card__colors-inner">
                 <h3 class="card__colors-title">Color</h3>
                 <div class="card__colors-wrap">
-                  ${[...COLORS_MAP.keys()]
+                  ${[...this._getColorMap().keys()]
                     .map(
                       colorName => `
                         <input
@@ -239,14 +224,6 @@ export class TaskEdit extends Component {
 
   set onRepeatToggleClickCb(cb) {
     this._onRepeatToggleClickCb = cb;
-  }
-
-  _isRepeated() {
-    return Object.values(this._repeatingDays).includes(true);
-  }
-
-  _getColor() {
-    return COLORS_MAP.get(this._color);
   }
 
   _partialUpdate() {

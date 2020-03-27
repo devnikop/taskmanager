@@ -1,22 +1,15 @@
-import { Component } from "./component";
+import { TaskComponent } from "./task-component";
 
-export class Task extends Component {
+export class Task extends TaskComponent {
   constructor(props) {
-    super();
-
-    this._title = props.title;
-    this._tags = props.tags;
-    this._color = props.color;
-    this._repeatingDays = props.repeatingDays;
-    this._isFavorite = props.isFavorite;
-    this._isDone = props.isDone;
+    super(props);
 
     this._onEdit = null;
   }
 
   get template() {
     return `
-      <article class="card card--${this._color} ${this._isRepeated() &&
+      <article class="card ${this._getColor()} ${this._isRepeated() &&
       `card--repeat`}">
         <form class="card__form" method="get">
           <div class="card__inner">
@@ -88,10 +81,6 @@ export class Task extends Component {
 
   set onEdit(cb) {
     this._onEdit = cb;
-  }
-
-  _isRepeated() {
-    return Object.values(this._repeatingDays).includes(true);
   }
 
   _bind() {
