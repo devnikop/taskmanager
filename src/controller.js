@@ -9,32 +9,48 @@ const getTaskElement = taskData => {
   const taskComponent = new Task(taskData);
   const taskEditComponent = new TaskEdit(taskData);
 
+  const updateInitialData = newData => {
+    taskData = { ...taskData, ...newData };
+  };
+
+  const updateDataInComponents = (data, ...components) => {
+    components.forEach(component => {
+      component.update(data);
+    });
+  };
+
+  const refreshComponent = (component, newData) => {
+    const oldTaskElement = component.element;
+    updateInitialData(newData);
+    updateDataInComponents(taskData, taskComponent, taskEditComponent);
+    component.render();
+    oldTaskElement.parentElement.replaceChild(
+      component.element,
+      oldTaskElement
+    );
+  };
+
+  taskComponent.onArchiveClickCb = newData =>
+    refreshComponent(taskComponent, newData);
+
   taskComponent.onEditClickCb = () => {
     taskEditComponent.render();
-    boardTasksElement.replaceChild(
+    taskComponent.element.parentElement.replaceChild(
       taskEditComponent.element,
       taskComponent.element
     );
     taskComponent.unrender();
   };
 
-  taskComponent.onArchiveClickCb = newData => {
-    taskData = { ...taskData, ...newData };
-
-    const oldTaskElement = taskComponent.element;
-    taskComponent.update(taskData);
-    taskComponent.render();
-    boardTasksElement.replaceChild(taskComponent.element, oldTaskElement);
-
-    taskEditComponent.update(taskData);
-  };
+  taskComponent.onFavoriteClickCb = newData =>
+    refreshComponent(taskComponent, newData);
 
   taskEditComponent.onFormSubmitCb = newData => {
     taskData = { ...taskData, ...newData };
 
     taskComponent.update(taskData);
     taskComponent.render();
-    boardTasksElement.replaceChild(
+    taskEditComponent.element.parentElement.replaceChild(
       taskComponent.element,
       taskEditComponent.element
     );

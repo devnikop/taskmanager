@@ -1,3 +1,3 @@
-import { initTasks } from "./taskold";
+import { initTasks } from "./controller";
 
 initTasks();

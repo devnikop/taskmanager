@@ -1,6 +1,6 @@
 import { getNode, getRandomNumber, removeChildren } from "./util";
 import { getFilterHtml } from "./filter-html";
-import { addTasks } from "./taskold";
+import { addTasks } from "./controller";
 
 const Selector = {
   MAIN_FILTER: `.main__filter`,

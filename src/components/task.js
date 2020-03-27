@@ -2,7 +2,8 @@ import { TaskComponent } from "./task-component";
 
 const Selector = {
   CARD_ARCHIVE: `.card__btn--archive`,
-  CARD_EDIT: `.card__btn--edit`
+  CARD_EDIT: `.card__btn--edit`,
+  CARD_FAVORITES: `.card__btn--favorites`
 };
 
 export class Task extends TaskComponent {
@@ -12,14 +13,17 @@ export class Task extends TaskComponent {
     // dom elements
     this._$cardArchive = null;
     this._$cardEdit = null;
+    this._$cardFavorites = null;
 
     // outer callback
     this._onArchiveClickCb = null;
     this._onEditClickCb = null;
+    this._onFavoriteClickCb = null;
 
     // inner event handlers
     this._onArchiveClick = this._onArchiveClick.bind(this);
     this._onEditClick = this._onEditClick.bind(this);
+    this._onFavoritesClick = this._onFavoritesClick.bind(this);
   }
 
   get template() {
@@ -102,9 +106,14 @@ export class Task extends TaskComponent {
     this._onEditClickCb = cb;
   }
 
+  set onFavoriteClickCb(cb) {
+    this._onFavoriteClickCb = cb;
+  }
+
   _initDomElements() {
     this._$cardArchive = this.element.querySelector(Selector.CARD_ARCHIVE);
-    this._$cardEdit = this._element.querySelector(Selector.CARD_EDIT);
+    this._$cardEdit = this.element.querySelector(Selector.CARD_EDIT);
+    this._$cardFavorites = this.element.querySelector(Selector.CARD_FAVORITES);
   }
 
   _bind() {
@@ -112,6 +121,7 @@ export class Task extends TaskComponent {
 
     this._$cardArchive.addEventListener(`click`, this._onArchiveClick);
     this._$cardEdit.addEventListener(`click`, this._onEditClick);
+    this._$cardFavorites.addEventListener(`click`, this._onFavoritesClick);
   }
 
   _unbind() {
@@ -138,5 +148,12 @@ export class Task extends TaskComponent {
 
   _onEditClick() {
     typeof this._onEditClickCb === `function` && this._onEditClickCb();
+  }
+
+  _onFavoritesClick() {
+    this._isFavorite = !this._isFavorite;
+
+    typeof this._onFavoriteClickCb === `function` &&
+      this._onFavoriteClickCb({ isFavorite: this._isFavorite });
   }
 }
