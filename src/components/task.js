@@ -127,11 +127,13 @@ export class Task extends TaskComponent {
   _unbind() {
     this._$cardArchive.removeEventListener(`click`, this._onArchiveClick);
     this._$cardEdit.removeEventListener(`click`, this._onEditClick);
+    this._$cardFavorites.removeEventListener(`click`, this._onFavoritesClick);
   }
 
   update(data) {
     this._color = data.color;
-
+    this._isDone = data.isDone;
+    this._isFavorite = data.isFavorite;
     this._repeatingDays = data.repeatingDays;
     this._tags = data.tags;
     this._title = data.title;

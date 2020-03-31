@@ -3,10 +3,12 @@ import flatpickr from "flatpickr";
 import { TaskComponent } from "./task-component";
 
 const Selector = {
+  CARD_ARCHIVE: `.card__btn--archive`,
   CARD_DATE_DEADLINE_TOGGLE: `.card__date-deadline-toggle`,
+  CARD_DATE: `.card__date`,
+  CARD_FAVORITES: `.card__btn--favorites`,
   CARD_FORM: `.card__form`,
   CARD_REPEAT_TOGGLE: `.card__repeat-toggle`,
-  CARD_DATE: `.card__date`,
   CARD_TIME: `.card__time`
 };
 
@@ -22,11 +24,21 @@ export class TaskEdit extends TaskComponent {
       isRepeated: false
     };
 
+    // dom elements
+    this._$cardArchive = null;
+    this._$cardFavorites = null;
+
+    // outer callback
+    this._onArchiveClickCb = null;
     this._onDateClickCb = null;
+    this._onFavoriteClickCb = null;
     this._onFormSubmitCb = null;
     this._onRepeatToggleClickCb = null;
 
+    // inner event handlers
+    this._onArchiveClick = this._onArchiveClick.bind(this);
     this._onDateClick = this._onDateClick.bind(this);
+    this._onFavoritesClick = this._onFavoritesClick.bind(this);
     this._onFormSumbit = this._onFormSumbit.bind(this);
     this._onRepeatToggleClick = this._onRepeatToggleClick.bind(this);
   }
@@ -214,8 +226,16 @@ export class TaskEdit extends TaskComponent {
     `;
   }
 
+  set onArchiveClickCb(cb) {
+    this._onArchiveClickCb = cb;
+  }
+
   set onDateClickCb(cb) {
     this._onDateClickCb = cb;
+  }
+
+  set onFavoriteClickCb(cb) {
+    this._onFavoriteClickCb = cb;
   }
 
   set onFormSubmitCb(cb) {
@@ -258,7 +278,18 @@ export class TaskEdit extends TaskComponent {
     return entry;
   }
 
+  _initDomElements() {
+    this._$cardArchive = this.element.querySelector(Selector.CARD_ARCHIVE);
+    this._$cardEdit = this.element.querySelector(Selector.CARD_EDIT);
+    this._$cardFavorites = this.element.querySelector(Selector.CARD_FAVORITES);
+  }
+
   _bind() {
+    this._initDomElements();
+
+    this._$cardArchive.addEventListener(`click`, this._onArchiveClick);
+    this._$cardFavorites.addEventListener(`click`, this._onFavoritesClick);
+
     this.element
       .querySelector(Selector.CARD_DATE_DEADLINE_TOGGLE)
       .addEventListener(`click`, this._onDateClick);
@@ -286,6 +317,8 @@ export class TaskEdit extends TaskComponent {
   }
 
   _unbind() {
+    this._$cardArchive.removeEventListener(`click`, this._onArchiveClick);
+    this._$cardFavorites.removeEventListener(`click`, this._onFavoritesClick);
     this.element
       .querySelector(Selector.CARD_DATE_DEADLINE_TOGGLE)
       .removeEventListener(`click`, this._onDateClick);
@@ -305,6 +338,16 @@ export class TaskEdit extends TaskComponent {
     this._repeatingDays = data.repeatingDays;
     this._tags = data.tags;
     this._title = data.title;
+  }
+
+  // inner event handlers
+  _onArchiveClick() {
+    this._isDone = !this._isDone;
+
+    typeof this._onArchiveClickCb === `function` &&
+      this._onArchiveClickCb({
+        isDone: this._isDone
+      });
   }
 
   _onDateClick() {
@@ -331,6 +374,13 @@ export class TaskEdit extends TaskComponent {
 
     typeof this._onRepeatToggleClickCb === `function` &&
       this._onRepeatToggleClickCb;
+  }
+
+  _onFavoritesClick() {
+    this._isFavorite = !this._isFavorite;
+
+    typeof this._onFavoriteClickCb === `function` &&
+      this._onFavoriteClickCb({ isFavorite: this._isFavorite });
   }
 
   static createMapper(target) {

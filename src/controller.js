@@ -30,6 +30,7 @@ const getTaskElement = taskData => {
     );
   };
 
+  // taskComponent callbacks
   taskComponent.onArchiveClickCb = newData =>
     refreshComponent(taskComponent, newData);
 
@@ -44,6 +45,13 @@ const getTaskElement = taskData => {
 
   taskComponent.onFavoriteClickCb = newData =>
     refreshComponent(taskComponent, newData);
+
+  // taskEditComponent callbacks
+  taskEditComponent.onArchiveClickCb = newData =>
+    refreshComponent(taskEditComponent, newData);
+
+  taskEditComponent.onFavoriteClickCb = newData =>
+    refreshComponent(taskEditComponent, newData);
 
   taskEditComponent.onFormSubmitCb = newData => {
     taskData = { ...taskData, ...newData };
