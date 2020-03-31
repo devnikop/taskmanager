@@ -61,7 +61,7 @@ const getTaskData = index => ({
   isDone: false
 });
 
-const taskList = Array.from({ length: 20 }, (item, index) =>
+const taskList = Array.from({ length: getRandomNumber(15) }, (item, index) =>
   getTaskData(index)
 );
 

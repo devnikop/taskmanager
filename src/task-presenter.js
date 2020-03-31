@@ -1,9 +1,10 @@
-import { taskList } from "./data";
 import { boardTasksElement } from "./filter";
+import { LoadMore } from "./load-more";
 import { Task } from "./components/task";
 import { TaskEdit } from "./components/task-edit";
+import { taskList } from "./data";
 
-const TASK_COUNT = 7;
+const TASK_COUNT_MAX = 8;
 
 const getTaskElement = taskData => {
   const taskComponent = new Task(taskData);
@@ -69,23 +70,26 @@ const getTaskElement = taskData => {
   return taskComponent.element;
 };
 
-const getTaskNodeList = () => {
+const getTaskNodeList = taskList => {
   const fragment = document.createDocumentFragment();
-  [...taskList]
-    .slice(0, TASK_COUNT)
-    .forEach(task => fragment.appendChild(getTaskElement(task)));
+  taskList.forEach(task => fragment.appendChild(getTaskElement(task)));
   return fragment;
 };
 
-const addTasks = () => {
-  const taskNodes = getTaskNodeList();
+const addTasks = taskList => {
+  const taskNodes = getTaskNodeList(taskList);
   boardTasksElement.appendChild(taskNodes);
 };
 
 const initTasks = () => {
-  addTasks();
+  const tasksToShow = [...taskList].slice(0, TASK_COUNT_MAX);
+  addTasks(tasksToShow);
+
+  const loadMoreComponent = new LoadMore({
+    taskCountMax: TASK_COUNT_MAX,
+    taskShownCount: tasksToShow.length
+  });
+  loadMoreComponent.init();
 };
-
-
 
 export { addTasks, initTasks };
