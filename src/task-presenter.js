@@ -2,7 +2,7 @@ import { boardTasksElement } from "./filter";
 import { LoadMore } from "./load-more";
 import { Task } from "./components/task";
 import { TaskEdit } from "./components/task-edit";
-import { taskList } from "./data";
+import { taskList, defaultData } from "./data";
 
 const TASK_COUNT_MAX = 8;
 
@@ -67,12 +67,15 @@ const getTaskElement = taskData => {
   };
 
   taskComponent.render();
-  return taskComponent.element;
+  return {
+    task: taskComponent.element,
+    taskEdit: taskEditComponent
+  };
 };
 
 const getTaskNodeList = taskList => {
   const fragment = document.createDocumentFragment();
-  taskList.forEach(task => fragment.appendChild(getTaskElement(task)));
+  taskList.forEach(task => fragment.appendChild(getTaskElement(task).task));
   return fragment;
 };
 
@@ -91,5 +94,13 @@ const initTasks = () => {
   });
   loadMoreComponent.init();
 };
+
+const $newTask = document.querySelector(`#control__new-task`);
+$newTask.addEventListener(`click`, () => {
+  boardTasksElement.insertAdjacentElement(
+    `afterbegin`,
+    getTaskElement(defaultData).taskEdit.render()
+  );
+});
 
 export { addTasks, initTasks };

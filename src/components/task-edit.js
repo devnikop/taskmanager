@@ -184,7 +184,7 @@ export class TaskEdit extends TaskComponent {
                   name="img"
                 />
                 <img
-                  src=${this._picture}
+                  src="${this._picture}"
                   alt="task picture"
                   class="card__img"
                 />

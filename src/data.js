@@ -65,4 +65,23 @@ const taskList = Array.from({ length: getRandomNumber(15) }, (item, index) =>
   getTaskData(index)
 );
 
-export { taskList };
+const defaultData = {
+  title: ``,
+  dueDate: ``,
+  tags: [],
+  picture: ``,
+  color: `black`,
+  repeatingDays: {
+    Mo: false,
+    Tu: false,
+    We: false,
+    Th: false,
+    Fr: false,
+    Sa: false,
+    Su: false
+  },
+  isFavorite: false,
+  isDone: false
+};
+
+export { taskList, defaultData };
