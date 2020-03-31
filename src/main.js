@@ -1,3 +1,3 @@
-import { initTasks } from "./controller";
+import { initTasks } from "./task-presenter";
 
 initTasks();
