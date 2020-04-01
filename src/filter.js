@@ -1,62 +1,66 @@
-import { getNode, getRandomNumber, removeChildren } from "./util";
-import { getFilterHtml } from "./filter-html";
-import { addTasks } from "./task-presenter";
+import { Component } from "./components/component";
 
 const Selector = {
-  MAIN_FILTER: `.main__filter`,
-  BOARD_TASKS: `.board__tasks`
+  FILTER_INPUT: `.filter__input`
 };
 
-const mainFilterElement = document.querySelector(Selector.MAIN_FILTER);
-// if (!mainFilterElement) {
-//   return null;
-// }
-const boardTasksElement = document.querySelector(Selector.BOARD_TASKS);
-// if (!boardTasksElement) {
-//   return null;
-// }
+export default class Filter extends Component {
+  constructor(props) {
+    super(props);
 
-const filterSet = [
-  `all`,
-  `overdue`,
-  `today`,
-  `favorites`,
-  `repeating`,
-  `tags`,
-  `archive`
-];
+    this._text = props.text;
+    this._count = props.count;
 
-const getFilterNode = filter => {
-  const filterHtml = getFilterHtml(filter, getRandomNumber(20));
-  const filterNode = getNode(filterHtml);
-  return filterNode;
-};
+    // dom elements
+    this._$filterInput = null;
 
-const getFilterNodeList = () => {
-  const fragment = document.createDocumentFragment();
-  filterSet.forEach(filter => {
-    fragment.appendChild(getFilterNode(filter));
-  });
-  return fragment;
-};
+    // outer callback
+    this._onChangeCb = null;
 
-const addFilters = () => {
-  const filterNodes = getFilterNodeList();
-  mainFilterElement.appendChild(filterNodes);
-};
+    // inner event handlers
+    this._onChange = this._onChange.bind(this);
 
-const onMainFilterClick = evt => {
-  if (evt.target.classList.contains(`filter__input`)) {
-    // boardTasksElement - module task
-    removeChildren(boardTasksElement);
-
-    // addTasks - module task
-    addTasks(getRandomNumber(5));
+    this._state = {
+      checked: false
+    };
   }
-};
 
-mainFilterElement.addEventListener(`click`, onMainFilterClick);
+  get template() {
+    return `
+      <div>
+        <input
+          type="radio"
+          id="filter__${this._text}"
+          class="filter__input visually-hidden"
+          name="filter"
+          ${this._state.checked ? `checked` : ``}
+          ${!this._count ? `disabled` : ``}
+        />
+        <label for="filter__${this._text}" class="filter__label">
+          ${this._text.toUpperCase()} <span class="filter__${this._text}-count">
+          ${this._count}</span>
+        </label>
+      </div>
+    `;
+  }
 
-addFilters();
+  set onChangeCb(cb) {
+    this._onChangeCb = cb;
+  }
 
-export { boardTasksElement };
+  _initDOMElements() {
+    this._$filterInput = this.element.querySelector(Selector.FILTER_INPUT);
+  }
+
+  _bind() {
+    this._initDOMElements();
+
+    this._$filterInput.addEventListener(`change`, this._onChange);
+  }
+
+  _onChange(evt) {
+    evt.preventDefault();
+    this._state.checked = !this._state.checked;
+    this._onChangeCb(this._text);
+  }
+}

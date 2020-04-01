@@ -1,8 +1,15 @@
-import { boardTasksElement } from "./filter";
+import {
+  boardTasksElement,
+  addFilters,
+  updateFilters
+} from "./filter-presenter";
 import { LoadMore } from "./load-more";
 import { Task } from "./components/task";
 import { TaskEdit } from "./components/task-edit";
 import { taskList, defaultData } from "./data";
+import cloneDeep from "lodash.clonedeep";
+
+const taskListCopy = cloneDeep(taskList);
 
 const TASK_COUNT_MAX = 8;
 
@@ -44,8 +51,10 @@ const getTaskElement = taskData => {
     taskComponent.unrender();
   };
 
-  taskComponent.onFavoriteClickCb = newData =>
+  taskComponent.onFavoriteClickCb = newData => {
     refreshComponent(taskComponent, newData);
+    updateFilters(taskListCopy);
+  };
 
   // taskEditComponent callbacks
   taskEditComponent.onArchiveClickCb = newData =>
@@ -85,7 +94,7 @@ const addTasks = taskList => {
 };
 
 const initTasks = () => {
-  const tasksToShow = [...taskList].slice(0, TASK_COUNT_MAX);
+  const tasksToShow = [...taskListCopy].slice(0, TASK_COUNT_MAX);
   addTasks(tasksToShow);
 
   const loadMoreComponent = new LoadMore({
@@ -94,6 +103,8 @@ const initTasks = () => {
   });
   loadMoreComponent.init();
 };
+
+addFilters(taskListCopy);
 
 const $newTask = document.querySelector(`#control__new-task`);
 $newTask.addEventListener(`click`, () => {

@@ -57,11 +57,11 @@ const getTaskData = index => ({
   picture: mockData.picture,
   color: mockData.color,
   repeatingDays: mockData.repeatingDays,
-  isFavorite: true,
-  isDone: false
+  isFavorite: Math.random() > 0.5 ? true : false,
+  isDone: Math.random() > 0.5 ? true : false
 });
 
-const taskList = Array.from({ length: getRandomNumber(15) }, (item, index) =>
+const taskList = Array.from({ length: getRandomNumber(25) }, (item, index) =>
   getTaskData(index)
 );
 
