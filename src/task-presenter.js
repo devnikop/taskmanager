@@ -60,6 +60,12 @@ const getTaskElement = taskData => {
   taskEditComponent.onArchiveClickCb = newData =>
     refreshComponent(taskEditComponent, newData);
 
+  taskEditComponent.onDeleteClickCb = () => {
+    taskListCopy.splice(taskData.id, 1);
+    taskEditComponent.element.remove();
+    taskEditComponent.unrender();
+  };
+
   taskEditComponent.onFavoriteClickCb = newData =>
     refreshComponent(taskEditComponent, newData);
 

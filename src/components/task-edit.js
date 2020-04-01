@@ -6,6 +6,7 @@ const Selector = {
   CARD_ARCHIVE: `.card__btn--archive`,
   CARD_DATE_DEADLINE_TOGGLE: `.card__date-deadline-toggle`,
   CARD_DATE: `.card__date`,
+  CARD_DELETE: `.card__delete`,
   CARD_FAVORITES: `.card__btn--favorites`,
   CARD_FORM: `.card__form`,
   CARD_REPEAT_TOGGLE: `.card__repeat-toggle`,
@@ -26,11 +27,13 @@ export class TaskEdit extends TaskComponent {
 
     // dom elements
     this._$cardArchive = null;
+    this._$cardDelete = null;
     this._$cardFavorites = null;
 
     // outer callback
     this._onArchiveClickCb = null;
     this._onDateClickCb = null;
+    this._onDeleteClickCb = null;
     this._onFavoriteClickCb = null;
     this._onFormSubmitCb = null;
     this._onRepeatToggleClickCb = null;
@@ -38,6 +41,7 @@ export class TaskEdit extends TaskComponent {
     // inner event handlers
     this._onArchiveClick = this._onArchiveClick.bind(this);
     this._onDateClick = this._onDateClick.bind(this);
+    this._onDeleteClick = this._onDeleteClick.bind(this);
     this._onFavoritesClick = this._onFavoritesClick.bind(this);
     this._onFormSumbit = this._onFormSumbit.bind(this);
     this._onRepeatToggleClick = this._onRepeatToggleClick.bind(this);
@@ -234,6 +238,10 @@ export class TaskEdit extends TaskComponent {
     this._onDateClickCb = cb;
   }
 
+  set onDeleteClickCb(cb) {
+    this._onDeleteClickCb = cb;
+  }
+
   set onFavoriteClickCb(cb) {
     this._onFavoriteClickCb = cb;
   }
@@ -280,6 +288,7 @@ export class TaskEdit extends TaskComponent {
 
   _initDomElements() {
     this._$cardArchive = this.element.querySelector(Selector.CARD_ARCHIVE);
+    this._$cardDelete = this.element.querySelector(Selector.CARD_DELETE);
     this._$cardEdit = this.element.querySelector(Selector.CARD_EDIT);
     this._$cardFavorites = this.element.querySelector(Selector.CARD_FAVORITES);
   }
@@ -288,6 +297,7 @@ export class TaskEdit extends TaskComponent {
     this._initDomElements();
 
     this._$cardArchive.addEventListener(`click`, this._onArchiveClick);
+    this._$cardDelete.addEventListener(`click`, this._onDeleteClick);
     this._$cardFavorites.addEventListener(`click`, this._onFavoritesClick);
 
     this.element
@@ -318,6 +328,7 @@ export class TaskEdit extends TaskComponent {
 
   _unbind() {
     this._$cardArchive.removeEventListener(`click`, this._onArchiveClick);
+    this._$cardDelete.removeEventListener(`click`, this._onDeleteClick);
     this._$cardFavorites.removeEventListener(`click`, this._onFavoritesClick);
     this.element
       .querySelector(Selector.CARD_DATE_DEADLINE_TOGGLE)
@@ -355,6 +366,10 @@ export class TaskEdit extends TaskComponent {
     this._partialUpdate();
 
     typeof this._onDateClickCb === `function` && this._onDateClickCb();
+  }
+
+  _onDeleteClick() {
+    this._onDeleteClickCb();
   }
 
   _onFormSumbit(evt) {
