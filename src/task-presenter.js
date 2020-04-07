@@ -1,28 +1,29 @@
 import {
   boardTasksElement,
   addFilters,
-  updateFilters
+  updateFilters,
 } from "./filter-presenter";
 import { LoadMore } from "./load-more";
 import { Task } from "./components/task";
 import { TaskEdit } from "./components/task-edit";
-import { taskList, defaultData } from "./data";
+import { defaultData } from "./data";
 import cloneDeep from "lodash.clonedeep";
+import { API } from "./api";
 
-const taskListCopy = cloneDeep(taskList);
+let taskListCopy = [];
 
 const TASK_COUNT_MAX = 8;
 
-const getTaskElement = taskData => {
+const getTaskElement = (taskData) => {
   const taskComponent = new Task(taskData);
   const taskEditComponent = new TaskEdit(taskData);
 
-  const updateInitialData = newData => {
+  const updateInitialData = (newData) => {
     taskData = { ...taskData, ...newData };
   };
 
   const updateDataInComponents = (data, ...components) => {
-    components.forEach(component => {
+    components.forEach((component) => {
       component.update(data);
     });
   };
@@ -39,7 +40,7 @@ const getTaskElement = taskData => {
   };
 
   // taskComponent callbacks
-  taskComponent.onArchiveClickCb = newData =>
+  taskComponent.onArchiveClickCb = (newData) =>
     refreshComponent(taskComponent, newData);
 
   taskComponent.onEditClickCb = () => {
@@ -51,14 +52,15 @@ const getTaskElement = taskData => {
     taskComponent.unrender();
   };
 
-  taskComponent.onFavoriteClickCb = newData => {
+  taskComponent.onFavoriteClickCb = (newData) => {
     refreshComponent(taskComponent, newData);
     updateFilters(taskListCopy);
   };
 
   // taskEditComponent callbacks
-  taskEditComponent.onArchiveClickCb = newData =>
+  taskEditComponent.onArchiveClickCb = (newData) => {
     refreshComponent(taskEditComponent, newData);
+  };
 
   taskEditComponent.onDeleteClickCb = () => {
     taskListCopy.splice(taskData.id, 1);
@@ -66,11 +68,12 @@ const getTaskElement = taskData => {
     taskEditComponent.unrender();
   };
 
-  taskEditComponent.onFavoriteClickCb = newData =>
+  taskEditComponent.onFavoriteClickCb = (newData) => {
     refreshComponent(taskEditComponent, newData);
+  };
 
-  taskEditComponent.onFormSubmitCb = newData => {
-    taskData = { ...taskData, ...newData };
+  taskEditComponent.onFormSubmitCb = (newData) => {
+    updateInitialData(newData);
 
     taskComponent.update(taskData);
     taskComponent.render();
@@ -84,33 +87,43 @@ const getTaskElement = taskData => {
   taskComponent.render();
   return {
     task: taskComponent.element,
-    taskEdit: taskEditComponent
+    taskEdit: taskEditComponent,
   };
 };
 
-const getTaskNodeList = taskList => {
+const getTaskNodeList = (taskList) => {
   const fragment = document.createDocumentFragment();
-  taskList.forEach(task => fragment.appendChild(getTaskElement(task).task));
+  taskList.forEach((task) => fragment.appendChild(getTaskElement(task).task));
   return fragment;
 };
 
-const addTasks = taskList => {
+const addTasks = (taskList) => {
   const taskNodes = getTaskNodeList(taskList);
   boardTasksElement.appendChild(taskNodes);
 };
 
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
+
+const api = new API({ endPoint: END_POINT, authorization: AUTHORIZATION });
+
 const initTasks = () => {
-  const tasksToShow = [...taskListCopy].slice(0, TASK_COUNT_MAX);
-  addTasks(tasksToShow);
-
-  const loadMoreComponent = new LoadMore({
-    taskCountMax: TASK_COUNT_MAX,
-    taskShownCount: tasksToShow.length
-  });
-  loadMoreComponent.init();
+  api
+    .getTasks()
+    .then((taskList) => {
+      taskListCopy = cloneDeep(taskList);
+      addTasks(taskListCopy);
+      addFilters(taskListCopy);
+      return taskListCopy;
+    })
+    .then((taskListCopy) => {
+      const loadMoreComponent = new LoadMore({
+        taskCountMax: TASK_COUNT_MAX,
+        taskList: taskListCopy,
+      });
+      loadMoreComponent.init();
+    });
 };
-
-addFilters(taskListCopy);
 
 const $newTask = document.querySelector(`#control__new-task`);
 $newTask.addEventListener(`click`, () => {

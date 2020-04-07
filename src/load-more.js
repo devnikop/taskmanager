@@ -1,10 +1,10 @@
 import { addTasks } from "./task-presenter";
-import { taskList } from "./data";
 
 export class LoadMore {
   constructor(props) {
     this._taskCountMax = props.taskCountMax;
-    this._taskShownCount = props.taskShownCount;
+    this._taskList = props.taskList;
+    this._taskShownCount = props.taskList.length;
 
     this._$loadMore = document.querySelector(`.load-more`);
   }
@@ -14,7 +14,7 @@ export class LoadMore {
   }
 
   _bind() {
-    this._$loadMore.addEventListener(`click`, evt => {
+    this._$loadMore.addEventListener(`click`, (evt) => {
       evt.preventDefault();
 
       const tasksToShow = [...taskList].slice(
@@ -29,7 +29,7 @@ export class LoadMore {
   }
 
   _checkFirstLoad() {
-    taskList.length - this._taskShownCount <= 0 && this._hide();
+    this._taskList.length - this._taskShownCount <= 0 && this._hide();
   }
 
   _hide() {
