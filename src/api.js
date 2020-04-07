@@ -4,10 +4,10 @@ const Method = {
   GET: `GET`,
   POST: `POST`,
   PUT: `PUT`,
-  DELETE: `DELETE`
+  DELETE: `DELETE`,
 };
 
-const checkStatus = response => {
+const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response;
   } else {
@@ -15,7 +15,7 @@ const checkStatus = response => {
   }
 };
 
-const toJSON = response => {
+const toJSON = (response) => {
   return response.json();
 };
 
@@ -26,18 +26,18 @@ export const API = class {
   }
 
   getTasks() {
-    return this._load({ url: `tasks` })
-      .then(toJSON)
-      .then(ModelTask.parseTasks);
+    return this._load({ url: `tasks` }).then(toJSON).then(ModelTask.parseTasks);
   }
 
   createTask({ task }) {
     return this._load({
       url: `tasks`,
       method: Method.POST,
-      body: JSON.stringify(task),
-      headers: new Headers({ "Content-Type": `application/json` })
-    }).then(toJSON);
+      body: JSON.stringify(ModelTask.toRaw(task)),
+      headers: new Headers({ "Content-Type": `application/json` }),
+    })
+      .then(toJSON)
+      .then(ModelTask.parseTask);
   }
 
   updateTask({ id, data }) {
@@ -45,7 +45,7 @@ export const API = class {
       url: `tasks/${id}`,
       method: Method.PUT,
       body: JSON.stringify(data),
-      headers: new Headers({ "Content-Type": `application/json` })
+      headers: new Headers({ "Content-Type": `application/json` }),
     }).then(toJSON);
   }
 
@@ -58,7 +58,7 @@ export const API = class {
 
     return fetch(`${this._endPoint}/${url}`, { method, body, headers })
       .then(checkStatus)
-      .catch(err => {
+      .catch((err) => {
         console.error(`fetch error: ${err}`);
         throw err;
       });

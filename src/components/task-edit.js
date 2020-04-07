@@ -1,6 +1,7 @@
 import flatpickr from "flatpickr";
 
 import { TaskComponent } from "./task-component";
+import moment from "moment";
 
 const Selector = {
   CARD_ARCHIVE: `.card__btn--archive`,
@@ -10,7 +11,7 @@ const Selector = {
   CARD_FAVORITES: `.card__btn--favorites`,
   CARD_FORM: `.card__form`,
   CARD_REPEAT_TOGGLE: `.card__repeat-toggle`,
-  CARD_TIME: `.card__time`
+  CARD_TIME: `.card__time`,
 };
 
 export class TaskEdit extends TaskComponent {
@@ -22,7 +23,7 @@ export class TaskEdit extends TaskComponent {
 
     this._state = {
       isDate: false,
-      isRepeated: false
+      isRepeated: false,
     };
 
     // dom elements
@@ -48,23 +49,30 @@ export class TaskEdit extends TaskComponent {
   }
 
   get template() {
+    if (this._dueDate) {
+      this._state.isDate = true;
+    }
+
     return `
-      <article class="card card--edit ${this._getColor()} ${this._isRepeated() &&
-      `card--repeat`}">
+      <article class="card card--edit ${this._getColor()} ${
+      this._isRepeated() && `card--repeat`
+    }">
         <form class="card__form" method="get">
           <div class="card__inner">
             <div class="card__control">
               <button type="button" class="card__btn card__btn--edit">
                 edit
               </button>
-              <button type="button" class="card__btn card__btn--archive ${!this
-                ._isDone && `card__btn--disabled`}">
+              <button type="button" class="card__btn card__btn--archive ${
+                !this._isDone && `card__btn--disabled`
+              }">
                 archive
               </button>
               <button
                 type="button"
-                class="card__btn card__btn--favorites ${!this._isFavorite &&
-                  `card__btn--disabled`}"
+                class="card__btn card__btn--favorites ${
+                  !this._isFavorite && `card__btn--disabled`
+                }"
               >
                 favorites
               </button>
@@ -95,15 +103,16 @@ export class TaskEdit extends TaskComponent {
                     }</span>
                   </button>
 
-                  <fieldset class="card__date-deadline" ${!this._state.isDate &&
-                    `disabled`}>
+                  <fieldset class="card__date-deadline" ${
+                    !this._state.isDate && `disabled`
+                  }>
                     <label class="card__input-deadline-wrap">
                       <input
                         class="card__date"
                         type="text"
                         placeholder="23 September"
                         name="date"
-                        value="${this._dueDate}"
+                        value="${moment(this._dueDate).format("D MMMM")}"
                       />
                     </label>
                     <label class="card__input-deadline-wrap">
@@ -112,6 +121,7 @@ export class TaskEdit extends TaskComponent {
                         type="text"
                         placeholder="11:15 PM"
                         name="time"
+                        value="${moment(this._dueDate).format("h:m A")}"
                       />
                     </label>
                   </fieldset>
@@ -122,12 +132,13 @@ export class TaskEdit extends TaskComponent {
                     }</span>
                   </button>
 
-                  <fieldset class="card__repeat-days" ${!this._state
-                    .isRepeated && `disabled`}>
+                  <fieldset class="card__repeat-days" ${
+                    !this._state.isRepeated && `disabled`
+                  }>
                     <div class="card__repeat-days-inner">
                       ${Object.keys(this._repeatingDays)
                         .map(
-                          day => `
+                          (day) => `
                             <input
                               class="visually-hidden card__repeat-day-input"
                               type="checkbox"
@@ -151,7 +162,7 @@ export class TaskEdit extends TaskComponent {
                   <div class="card__hashtag-list">
                     ${[...this._tags]
                       .map(
-                        tag =>
+                        (tag) =>
                           `<span class="card__hashtag-inner">
                             <input
                               type="hidden"
@@ -199,7 +210,7 @@ export class TaskEdit extends TaskComponent {
                 <div class="card__colors-wrap">
                   ${[...this._getColorMap().keys()]
                     .map(
-                      colorName => `
+                      (colorName) => `
                         <input
                           type="radio"
                           id="color-${colorName}-${this._id}"
@@ -263,7 +274,10 @@ export class TaskEdit extends TaskComponent {
   _processForm(formData) {
     const entry = {
       color: ``,
-      dueDate: new Date(),
+      dueDate: 0,
+      id: this._id,
+      isFavorite: false,
+      isDone: false,
       repeatingDays: {
         Mo: false,
         Tu: false,
@@ -271,10 +285,10 @@ export class TaskEdit extends TaskComponent {
         Th: false,
         Fr: false,
         Sa: false,
-        Su: false
+        Su: false,
       },
       tags: new Set(),
-      title: ``
+      title: ``,
     };
 
     const taskEditMapper = TaskEdit.createMapper(entry);
@@ -314,14 +328,14 @@ export class TaskEdit extends TaskComponent {
       flatpickr(".card__date", {
         altInput: true,
         altFormat: "j F",
-        dateFormat: "j F"
+        dateFormat: "j F",
       });
       flatpickr(".card__time", {
         enableTime: true,
         noCalendar: true,
         altInput: true,
         altFormat: "h:i K",
-        dateFormat: "h:i K"
+        dateFormat: "h:i K",
       });
     }
   }
@@ -357,7 +371,7 @@ export class TaskEdit extends TaskComponent {
 
     typeof this._onArchiveClickCb === `function` &&
       this._onArchiveClickCb({
-        isDone: this._isDone
+        isDone: this._isDone,
       });
   }
 
@@ -400,11 +414,12 @@ export class TaskEdit extends TaskComponent {
 
   static createMapper(target) {
     return {
-      color: value => (target.color = value),
-      date: value => (target.dueDate = value),
-      repeat: value => (target.repeatingDays[value] = true),
-      hashtag: value => target.tags.add(value),
-      text: value => (target.title = value)
+      color: (value) => (target.color = value),
+      date: (value) => (target.dueDate = moment(value, "D MMMM").unix()),
+      time: (value) => (target.dueDate = moment(value, "h:m A").unix()),
+      repeat: (value) => (target.repeatingDays[value] = true),
+      hashtag: (value) => target.tags.add(value),
+      text: (value) => (target.title = value),
     };
   }
 }

@@ -4,7 +4,7 @@ const mockData = {
   titleList: [
     `Learn theory`,
     `Do homework`,
-    `Finish workshop for hundread score`
+    `Finish workshop for hundread score`,
   ],
   tagsList: new Set([`homework`, `theory`, `practice`, `intensive`, `keks`]),
   colorList: new Set([`black`, `yellow`, `blue`, `green`, `pink`]),
@@ -44,12 +44,12 @@ const mockData = {
       Th: Math.random() > 0.5 ? true : false,
       Fr: Math.random() > 0.5 ? true : false,
       Sa: Math.random() > 0.5 ? true : false,
-      Su: Math.random() > 0.5 ? true : false
+      Su: Math.random() > 0.5 ? true : false,
     };
-  }
+  },
 };
 
-const getTaskData = index => ({
+const getTaskData = (index) => ({
   id: index,
   title: mockData.title,
   dueDate: mockData.date,
@@ -58,7 +58,7 @@ const getTaskData = index => ({
   color: mockData.color,
   repeatingDays: mockData.repeatingDays,
   isFavorite: Math.random() > 0.5 ? true : false,
-  isDone: Math.random() > 0.5 ? true : false
+  isDone: Math.random() > 0.5 ? true : false,
 });
 
 const taskList = Array.from({ length: getRandomNumber(25) }, (item, index) =>
@@ -66,11 +66,12 @@ const taskList = Array.from({ length: getRandomNumber(25) }, (item, index) =>
 );
 
 const defaultData = {
-  title: ``,
-  dueDate: ``,
-  tags: [],
-  picture: ``,
   color: `black`,
+  dueDate: ``,
+  id: null,
+  isDone: false,
+  isFavorite: false,
+  picture: ``,
   repeatingDays: {
     Mo: false,
     Tu: false,
@@ -78,10 +79,10 @@ const defaultData = {
     Th: false,
     Fr: false,
     Sa: false,
-    Su: false
+    Su: false,
   },
-  isFavorite: false,
-  isDone: false
+  tags: [],
+  title: ``,
 };
 
 export { taskList, defaultData };

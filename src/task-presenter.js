@@ -19,7 +19,15 @@ const getTaskElement = (taskData) => {
   const taskEditComponent = new TaskEdit(taskData);
 
   const updateInitialData = (newData) => {
+    if (Object.is(newData.id, null)) {
+      newData.id = taskListCopy.length;
+      api.createTask({ task: newData }).then((newTask) => {
+        taskListCopy.push(newTask);
+        return newTask;
+      });
+    }
     taskData = { ...taskData, ...newData };
+    return taskData;
   };
 
   const updateDataInComponents = (data, ...components) => {
@@ -73,9 +81,9 @@ const getTaskElement = (taskData) => {
   };
 
   taskEditComponent.onFormSubmitCb = (newData) => {
-    updateInitialData(newData);
+    const data = updateInitialData(newData);
 
-    taskComponent.update(taskData);
+    taskComponent.update(data);
     taskComponent.render();
     taskEditComponent.element.parentElement.replaceChild(
       taskComponent.element,
@@ -102,7 +110,7 @@ const addTasks = (taskList) => {
   boardTasksElement.appendChild(taskNodes);
 };
 
-const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=3234}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
 
 const api = new API({ endPoint: END_POINT, authorization: AUTHORIZATION });
