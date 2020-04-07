@@ -1,10 +1,11 @@
 import { addTasks } from "./task-presenter";
 import { removeChildren } from "./util";
 import Filter from "./filter";
+import moment from "moment";
 
 const Selector = {
   MAIN_FILTER: `.main__filter`,
-  BOARD_TASKS: `.board__tasks`
+  BOARD_TASKS: `.board__tasks`,
 };
 
 const mainFilterElement = document.querySelector(Selector.MAIN_FILTER);
@@ -17,7 +18,7 @@ const filterSet = [
   `favorites`,
   `repeating`,
   `tags`,
-  `archive`
+  `archive`,
 ];
 
 const getFilteredTaskList = (taskList, filter) => {
@@ -27,16 +28,20 @@ const getFilteredTaskList = (taskList, filter) => {
       taskListFiltered = taskList;
       break;
     case `overdue`:
-      taskListFiltered = taskList;
+      taskListFiltered = taskList.filter((task) =>
+        moment(task.dueDate).isBefore(moment(), "day")
+      );
       break;
     case `today`:
-      taskListFiltered = taskList;
+      taskListFiltered = taskList.filter((task) =>
+        moment(task.dueDate).isSame(moment(), "day")
+      );
       break;
     case `favorites`:
-      taskListFiltered = taskList.filter(task => task.isFavorite);
+      taskListFiltered = taskList.filter((task) => task.isFavorite);
       break;
     case `repeating`:
-      taskListFiltered = taskList.filter(task =>
+      taskListFiltered = taskList.filter((task) =>
         Object.values(task.repeatingDays).includes(true)
       );
       break;
@@ -44,7 +49,7 @@ const getFilteredTaskList = (taskList, filter) => {
       taskListFiltered = taskList;
       break;
     case `archive`:
-      taskListFiltered = taskList.filter(task => task.isDone);
+      taskListFiltered = taskList.filter((task) => task.isDone);
     default:
       break;
   }
@@ -55,10 +60,10 @@ const getFilteredTaskList = (taskList, filter) => {
 const getFilterElement = (taskList, filter) => {
   const filterComponent = new Filter({
     text: filter,
-    count: getFilteredTaskList(taskList, filter).length
+    count: getFilteredTaskList(taskList, filter).length,
   });
 
-  filterComponent.onChangeCb = filterTitle => {
+  filterComponent.onChangeCb = (filterTitle) => {
     removeChildren(boardTasksElement);
     addTasks(getFilteredTaskList(taskList, filterTitle));
   };
@@ -67,15 +72,15 @@ const getFilterElement = (taskList, filter) => {
   return filterComponent.element;
 };
 
-const getFilterList = taskList => {
+const getFilterList = (taskList) => {
   const fragment = document.createDocumentFragment();
-  filterSet.forEach(filter => {
+  filterSet.forEach((filter) => {
     fragment.appendChild(getFilterElement(taskList, filter));
   });
   return fragment;
 };
 
-const addFilters = taskList => {
+const addFilters = (taskList) => {
   const filterNodes = getFilterList(taskList);
   mainFilterElement.appendChild(filterNodes);
 };
@@ -84,7 +89,7 @@ const clearFilters = () => {
   removeChildren(mainFilterElement);
 };
 
-const updateFilters = taskList => {
+const updateFilters = (taskList) => {
   clearFilters();
   addFilters(taskList);
 };
