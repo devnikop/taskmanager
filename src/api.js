@@ -7,26 +7,10 @@ const Method = {
   DELETE: `DELETE`,
 };
 
-const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  } else {
-    throw new Error(`${response.status}: ${response.statusText}`);
-  }
-};
-
-const toJSON = (response) => {
-  return response.json();
-};
-
-export const API = class {
-  constructor({ endPoint, authorization }) {
-    this._endPoint = endPoint;
-    this._authorization = authorization;
-  }
-
-  getTasks() {
-    return this._load({ url: `tasks` }).then(toJSON).then(ModelTask.parseTasks);
+export default class API {
+  constructor(props) {
+    this._endPoint = props.endPoint;
+    this._authorization = props.authorization;
   }
 
   createTask({ task }) {
@@ -36,17 +20,25 @@ export const API = class {
       body: JSON.stringify(ModelTask.toRaw(task)),
       headers: new Headers({ "Content-Type": `application/json` }),
     })
-      .then(toJSON)
+      .then(API.toJson)
       .then(ModelTask.parseTask);
+  }
+
+  getTasks() {
+    return this._load({ url: `tasks` })
+      .then(API.toJson)
+      .then(ModelTask.parseTasks);
   }
 
   updateTask({ id, data }) {
     return this._load({
       url: `tasks/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data),
+      body: JSON.stringify(ModelTask.toRaw(data)),
       headers: new Headers({ "Content-Type": `application/json` }),
-    }).then(toJSON);
+    })
+      .then(API.toJson)
+      .then(ModelTask.parseTask);
   }
 
   deleteTask({ id }) {
@@ -57,10 +49,21 @@ export const API = class {
     headers.append(`Authorization`, this._authorization);
 
     return fetch(`${this._endPoint}/${url}`, { method, body, headers })
-      .then(checkStatus)
+      .then(API.checkStatus)
       .catch((err) => {
         console.error(`fetch error: ${err}`);
         throw err;
       });
   }
-};
+
+  static checkStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+      return response;
+    }
+    throw new Error(`${response.status}: ${response.statusText}`);
+  }
+
+  static toJson(response) {
+    return response.json();
+  }
+}

@@ -8,7 +8,7 @@ import { Task } from "./components/task";
 import { TaskEdit } from "./components/task-edit";
 import { defaultData } from "./data";
 import cloneDeep from "lodash.clonedeep";
-import { API } from "./api";
+import API from "./api";
 
 let taskListCopy = [];
 
@@ -21,13 +21,14 @@ const getTaskElement = (taskData) => {
   const updateInitialData = (newData) => {
     if (Object.is(newData.id, null)) {
       newData.id = taskListCopy.length;
-      api.createTask({ task: newData }).then((newTask) => {
+      return api.createTask({ task: newData }).then((newTask) => {
         taskListCopy.push(newTask);
         return newTask;
       });
+    } else {
+      taskData = { ...taskData, ...newData };
+      return api.updateTask({ id: taskData.id, data: taskData });
     }
-    taskData = { ...taskData, ...newData };
-    return taskData;
   };
 
   const updateDataInComponents = (data, ...components) => {
@@ -70,26 +71,45 @@ const getTaskElement = (taskData) => {
     refreshComponent(taskEditComponent, newData);
   };
 
-  taskEditComponent.onDeleteClickCb = () => {
+  taskEditComponent.onDeleteClickCb = (id) => {
     taskListCopy.splice(taskData.id, 1);
-    taskEditComponent.element.remove();
-    taskEditComponent.unrender();
+    api.deleteTask({ id }).then(() => {
+      taskEditComponent.element.remove();
+      taskEditComponent.unrender();
+    });
   };
 
   taskEditComponent.onFavoriteClickCb = (newData) => {
     refreshComponent(taskEditComponent, newData);
   };
 
-  taskEditComponent.onFormSubmitCb = (newData) => {
-    const data = updateInitialData(newData);
+  taskEditComponent.onFormSubmitCb = (newData, button) => {
+    const blockButton = () => {
+      button.textContent = `Saving`;
+      button.disabled = true;
+    };
 
-    taskComponent.update(data);
-    taskComponent.render();
-    taskEditComponent.element.parentElement.replaceChild(
-      taskComponent.element,
-      taskEditComponent.element
-    );
-    taskEditComponent.unrender();
+    const unblockButton = () => {
+      button.textContent = `Save`;
+      button.disabled = false;
+    };
+
+    blockButton();
+    updateInitialData(newData)
+      .then((data) => {
+        unblockButton();
+        updateDataInComponents(data, taskComponent, taskEditComponent);
+        taskComponent.render();
+        taskEditComponent.element.parentElement.replaceChild(
+          taskComponent.element,
+          taskEditComponent.element
+        );
+        taskEditComponent.unrender();
+      })
+      .catch(() => {
+        taskEditComponent.shake();
+        unblockButton();
+      });
   };
 
   taskComponent.render();
@@ -110,7 +130,7 @@ const addTasks = (taskList) => {
   boardTasksElement.appendChild(taskNodes);
 };
 
-const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=3234}`;
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=3234`;
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
 
 const api = new API({ endPoint: END_POINT, authorization: AUTHORIZATION });

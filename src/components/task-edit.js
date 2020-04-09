@@ -11,6 +11,7 @@ const Selector = {
   CARD_FAVORITES: `.card__btn--favorites`,
   CARD_FORM: `.card__form`,
   CARD_REPEAT_TOGGLE: `.card__repeat-toggle`,
+  CARD_SAVE: `.card__save`,
   CARD_TIME: `.card__time`,
 };
 
@@ -49,9 +50,8 @@ export class TaskEdit extends TaskComponent {
   }
 
   get template() {
-    if (this._dueDate) {
-      this._state.isDate = true;
-    }
+    this._dueDate && (this._state.isDate = true);
+    this._isRepeated() && (this._state.isRepeated = true);
 
     return `
       <article class="card card--edit ${this._getColor()} ${
@@ -279,13 +279,13 @@ export class TaskEdit extends TaskComponent {
       isFavorite: false,
       isDone: false,
       repeatingDays: {
-        Mo: false,
-        Tu: false,
-        We: false,
-        Th: false,
-        Fr: false,
-        Sa: false,
-        Su: false,
+        mo: false,
+        tu: false,
+        we: false,
+        th: false,
+        fr: false,
+        sa: false,
+        su: false,
       },
       tags: new Set(),
       title: ``,
@@ -365,6 +365,15 @@ export class TaskEdit extends TaskComponent {
     this._title = data.title;
   }
 
+  shake() {
+    const ANIMATION_TIMEOUT = 600;
+    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._element.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+  }
+
   // inner event handlers
   _onArchiveClick() {
     this._isDone = !this._isDone;
@@ -383,7 +392,7 @@ export class TaskEdit extends TaskComponent {
   }
 
   _onDeleteClick() {
-    this._onDeleteClickCb();
+    this._onDeleteClickCb(this._id);
   }
 
   _onFormSumbit(evt) {
@@ -392,9 +401,11 @@ export class TaskEdit extends TaskComponent {
       this.element.querySelector(Selector.CARD_FORM)
     );
     const newData = this._processForm(formData);
-    typeof this._onFormSubmitCb === `function` && this._onFormSubmitCb(newData);
-
-    this.update(newData);
+    typeof this._onFormSubmitCb === `function` &&
+      this._onFormSubmitCb(
+        newData,
+        this.element.querySelector(Selector.CARD_SAVE)
+      );
   }
 
   _onRepeatToggleClick() {
