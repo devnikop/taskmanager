@@ -1,4 +1,5 @@
 import { getRandomArrayItem, getRandomNumber } from "./util";
+import moment from "moment";
 
 const mockData = {
   titleList: [
@@ -67,7 +68,7 @@ const taskList = Array.from({ length: getRandomNumber(25) }, (item, index) =>
 
 const defaultData = {
   color: `black`,
-  dueDate: ``,
+  dueDate: moment().valueOf(),
   id: null,
   isDone: false,
   isFavorite: false,
