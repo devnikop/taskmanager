@@ -9,6 +9,7 @@ import { TaskEdit } from "./components/task-edit";
 import { defaultData } from "./data";
 import cloneDeep from "lodash.clonedeep";
 import API from "./api";
+import Stats from "./stats";
 
 let taskListCopy = [];
 
@@ -150,6 +151,10 @@ const initTasks = () => {
         taskList: taskListCopy,
       });
       loadMoreComponent.init();
+      return taskListCopy;
+    })
+    .then((taskListCopy) => {
+      new Stats({ data: taskListCopy });
     });
 };
 
