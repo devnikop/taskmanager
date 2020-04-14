@@ -10,6 +10,8 @@ import { defaultData } from "./data";
 import cloneDeep from "lodash.clonedeep";
 import API from "./api";
 import Stats from "./stats";
+import Provider from "./provider";
+import Store from "./store";
 
 let taskListCopy = [];
 
@@ -22,13 +24,13 @@ const getTaskElement = (taskData) => {
   const updateInitialData = (newData) => {
     if (Object.is(newData.id, null)) {
       newData.id = taskListCopy.length;
-      return api.createTask({ task: newData }).then((newTask) => {
+      return provider.createTask({ task: newData }).then((newTask) => {
         taskListCopy.push(newTask);
         return newTask;
       });
     } else {
       taskData = { ...taskData, ...newData };
-      return api.updateTask({ id: taskData.id, data: taskData });
+      return provider.updateTask({ id: taskData.id, data: taskData });
     }
   };
 
@@ -74,7 +76,7 @@ const getTaskElement = (taskData) => {
 
   taskEditComponent.onDeleteClickCb = (id) => {
     taskListCopy.splice(taskData.id, 1);
-    api.deleteTask({ id }).then(() => {
+    provider.deleteTask({ id }).then(() => {
       taskEditComponent.element.remove();
       taskEditComponent.unrender();
     });
@@ -133,11 +135,27 @@ const addTasks = (taskList) => {
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=3234`;
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
+const TASKS_STORE_KEY = `tasks-store-key`;
 
 const api = new API({ endPoint: END_POINT, authorization: AUTHORIZATION });
+const store = new Store({ key: TASKS_STORE_KEY, storage: localStorage });
+const provider = new Provider({
+  api,
+  store,
+  generateId: () => String(Date.now()),
+});
+
+window.addEventListener(
+  `offline`,
+  () => (document.title = `${document.title}[OFFLINE]`)
+);
+window.addEventListener(`online`, () => {
+  document.title = document.title.split(`[OFFLINE]`)[0];
+  provider.syncTasks();
+});
 
 const initTasks = () => {
-  api
+  provider
     .getTasks()
     .then((taskList) => {
       taskListCopy = cloneDeep(taskList);
