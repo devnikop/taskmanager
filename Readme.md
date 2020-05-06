@@ -1,1 +1,7 @@
-Project for js learning
+# taskmanager
+
+Project for mastering js
+
+## Built With
+
+- Vanilla js
