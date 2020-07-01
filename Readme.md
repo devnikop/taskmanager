@@ -1,5 +1,5 @@
 # Task manager
-> Simple project to create and edit your tasks.
+> Simple project for managing tasks.
 
 ![Preview screenshot](./readme_assets/preview.jpg)
 
